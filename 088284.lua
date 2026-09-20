@@ -91,6 +91,7 @@ local Aimbot = {
     ToggleMode       = false,
     TeamCheck        = false,
     VisibleCheck     = false,
+    ForceFieldCheck  = false,
     AimPart          = "Head",
     FOV              = 138,
     FOV_Enabled      = false,
@@ -377,6 +378,23 @@ local function IsExceptionPlayer(plr)
     return false
 end
 
+local function IsForceFieldProtected(plr)
+    if not plr or not plr.Character then return false end
+
+    if plr.Character:FindFirstChildOfClass("ForceField") or plr.Character:FindFirstChild("ForceField") then
+        return true
+    end
+
+    local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return false end
+
+    local spawn = Workspace:FindFirstChildOfClass("SpawnLocation")
+    if not spawn then return false end
+
+    local distToSpawn = (hrp.Position - spawn.Position).Magnitude
+    return distToSpawn <= math.max(spawn.Size.X, 8) + 4
+end
+
 local function AddException(name)
     if not name or name == "None" then return false end
     for _, current in ipairs(Aimbot.Exceptions) do
@@ -405,6 +423,7 @@ local function GetTarget()
         if plr == LocalPlayer or not plr.Character or plr.Character:FindFirstChild("Humanoid").Health <= 0 then continue end
         if Aimbot.TeamCheck and plr.Team == LocalPlayer.Team then continue end
         if IsExceptionPlayer(plr) then continue end
+        if Aimbot.ForceFieldCheck and IsForceFieldProtected(plr) then continue end
 
         local part = plr.Character:FindFirstChild(Aimbot.AimPart) or plr.Character:FindFirstChild("HumanoidRootPart")
         if not part then continue end
@@ -614,6 +633,11 @@ TabAimbot:Toggle({
     Title    = "Visible Check (Wall Check)",
     Default  = false,
     Callback = function(v) Aimbot.VisibleCheck = v end,
+})
+TabAimbot:Toggle({
+    Title    = "Force Field Check (Spawn Protection Check)",
+    Default  = false,
+    Callback = function(v) Aimbot.ForceFieldCheck = v end,
 })
 TabAimbot:Toggle({
     Title    = "Prediction",
@@ -960,17 +984,18 @@ local function SerializarConfig()
             TeamCheck     = ESP_Settings.TeamCheck,
         },
         Aimbot = {
-            Enabled      = Aimbot.Enabled,
-            ToggleMode   = Aimbot.ToggleMode,
-            TeamCheck    = Aimbot.TeamCheck,
-            VisibleCheck = Aimbot.VisibleCheck,
-            Prediction   = Aimbot.Prediction,
-            AimPart      = Aimbot.AimPart,
-            FOV          = Aimbot.FOV,
-            Smoothness   = Aimbot.Smoothness,
-            FOV_Enabled  = Aimbot.FOV_Enabled,
-            Exceptions   = Aimbot.Exceptions,
-            Modo         = Aimbot.Modo,
+            Enabled          = Aimbot.Enabled,
+            ToggleMode       = Aimbot.ToggleMode,
+            TeamCheck        = Aimbot.TeamCheck,
+            VisibleCheck     = Aimbot.VisibleCheck,
+            ForceFieldCheck  = Aimbot.ForceFieldCheck,
+            Prediction       = Aimbot.Prediction,
+            AimPart          = Aimbot.AimPart,
+            FOV              = Aimbot.FOV,
+            Smoothness       = Aimbot.Smoothness,
+            FOV_Enabled      = Aimbot.FOV_Enabled,
+            Exceptions       = Aimbot.Exceptions,
+            Modo             = Aimbot.Modo,
         },
         FPS = {
             Fullbright   = FPS_S.Fullbright,
@@ -1017,17 +1042,18 @@ local function CarregarConfig()
             ESP_Settings.TeamCheck         = data.ESP.TeamCheck or false
         end
         if data.Aimbot then
-            Aimbot.Enabled      = data.Aimbot.Enabled      or false
-            Aimbot.ToggleMode   = data.Aimbot.ToggleMode   or false
-            Aimbot.TeamCheck    = data.Aimbot.TeamCheck    or false
-            Aimbot.VisibleCheck = data.Aimbot.VisibleCheck or false
-            Aimbot.Prediction   = data.Aimbot.Prediction   or false
-            Aimbot.AimPart      = data.Aimbot.AimPart      or "Head"
-            Aimbot.FOV          = data.Aimbot.FOV          or 160
-            Aimbot.Smoothness   = data.Aimbot.Smoothness   or 10
-            Aimbot.FOV_Enabled  = data.Aimbot.FOV_Enabled  or false
-            Aimbot.Exceptions   = data.Aimbot.Exceptions   or {}
-            Aimbot.Modo         = data.Aimbot.Modo         or "Pro"
+            Aimbot.Enabled         = data.Aimbot.Enabled         or false
+            Aimbot.ToggleMode      = data.Aimbot.ToggleMode      or false
+            Aimbot.TeamCheck       = data.Aimbot.TeamCheck       or false
+            Aimbot.VisibleCheck    = data.Aimbot.VisibleCheck    or false
+            Aimbot.ForceFieldCheck = data.Aimbot.ForceFieldCheck or false
+            Aimbot.Prediction      = data.Aimbot.Prediction      or false
+            Aimbot.AimPart         = data.Aimbot.AimPart         or "Head"
+            Aimbot.FOV             = data.Aimbot.FOV             or 160
+            Aimbot.Smoothness      = data.Aimbot.Smoothness      or 10
+            Aimbot.FOV_Enabled     = data.Aimbot.FOV_Enabled     or false
+            Aimbot.Exceptions      = data.Aimbot.Exceptions      or {}
+            Aimbot.Modo            = data.Aimbot.Modo            or "Pro"
         end
         if data.FPS then
             if data.FPS.Fullbright  then ApplyFullbright(true)  end
