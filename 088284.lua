@@ -105,6 +105,12 @@ local Aimbot = {
     Modo             = "Pro",  -- "Legit", "Pro"
 }
 
+local QuickDock = {
+    Enabled  = false,
+    Pinned   = false,
+    Position = UDim2.new(0.04, 0, 0.50, 0),
+}
+
 -- Presets de modo
 local AimbotModos = {
     Legit = { Smoothness = 20, FOV = 80  },
@@ -358,6 +364,45 @@ local function AplicarModo(modo)
     UpdateFOV()
 end
 
+local AimPartOrder = { "Head", "HumanoidRootPart", "UpperTorso", "LowerTorso" }
+
+local function UpdateQuickDockDisplay()
+    if not QuickDockGui then return end
+    QuickDockGui.Enabled = QuickDock.Enabled
+    if not QuickDock.Enabled then return end
+
+    if QuickDockToggleLabel then
+        QuickDockToggleLabel.Text = Aimbot.Enabled and "aimbot on" or "aimbot off"
+        QuickDockToggleLabel.TextColor3 = Aimbot.Enabled and Color3.fromRGB(123, 255, 176) or Color3.fromRGB(255, 156, 156)
+    end
+
+    if QuickDockAimLabel then
+        QuickDockAimLabel.Text = Aimbot.AimPart
+    end
+
+    if QuickDockPinLabel then
+        QuickDockPinLabel.Text = QuickDock.Pinned and "📍" or "📌"
+    end
+end
+
+local function ToggleAimbotQuick()
+    Aimbot.Enabled = not Aimbot.Enabled
+    UpdateQuickDockDisplay()
+end
+
+local function CycleAimPart()
+    local index = 1
+    for i, part in ipairs(AimPartOrder) do
+        if part == Aimbot.AimPart then
+            index = i
+            break
+        end
+    end
+    index = index % #AimPartOrder + 1
+    Aimbot.AimPart = AimPartOrder[index]
+    UpdateQuickDockDisplay()
+end
+
 local function GetAimbotExceptionNames()
     local names = {"None"}
     for _, plr in ipairs(Players:GetPlayers()) do
@@ -452,6 +497,123 @@ local function GetTarget()
     end
     return closest
 end
+
+local QuickDockGui = Instance.new("ScreenGui")
+QuickDockGui.Name = "ProAim_QuickDock"
+QuickDockGui.ResetOnSpawn = false
+QuickDockGui.IgnoreGuiInset = true
+QuickDockGui.DisplayOrder = 10000
+QuickDockGui.Parent = CoreGui
+QuickDockGui.Enabled = QuickDock.Enabled
+
+local QuickDockContainer = Instance.new("Frame")
+QuickDockContainer.Name = "QuickDock"
+QuickDockContainer.Size = UDim2.fromOffset(122, 122)
+QuickDockContainer.Position = QuickDock.Position
+QuickDockContainer.AnchorPoint = Vector2.new(0, 0)
+QuickDockContainer.BackgroundTransparency = 1
+QuickDockContainer.Parent = QuickDockGui
+
+local QuickDockButton = Instance.new("TextButton")
+QuickDockButton.Name = "MainButton"
+QuickDockButton.Size = UDim2.fromScale(1, 1)
+QuickDockButton.Text = ""
+QuickDockButton.AutoButtonColor = false
+QuickDockButton.BackgroundColor3 = Color3.fromRGB(10, 26, 45)
+QuickDockButton.BorderSizePixel = 0
+QuickDockButton.Parent = QuickDockContainer
+
+local QuickDockCorner = Instance.new("UICorner")
+QuickDockCorner.CornerRadius = UDim.new(1, 0)
+QuickDockCorner.Parent = QuickDockButton
+
+local QuickDockStroke = Instance.new("UIStroke")
+QuickDockStroke.Thickness = 2
+QuickDockStroke.Color = Color3.fromRGB(126, 201, 255)
+QuickDockStroke.Transparency = 0.15
+QuickDockStroke.Parent = QuickDockButton
+
+QuickDockToggleLabel = Instance.new("TextButton")
+QuickDockToggleLabel.Name = "ToggleLabel"
+QuickDockToggleLabel.Size = UDim2.new(0.82, 0, 0.34, 0)
+QuickDockToggleLabel.Position = UDim2.new(0.09, 0, 0.14, 0)
+QuickDockToggleLabel.Text = Aimbot.Enabled and "aimbot on" or "aimbot off"
+QuickDockToggleLabel.TextScaled = true
+QuickDockToggleLabel.Font = Enum.Font.GothamBold
+QuickDockToggleLabel.TextColor3 = Aimbot.Enabled and Color3.fromRGB(123, 255, 176) or Color3.fromRGB(255, 156, 156)
+QuickDockToggleLabel.BackgroundTransparency = 1
+QuickDockToggleLabel.AutoButtonColor = false
+QuickDockToggleLabel.Parent = QuickDockButton
+QuickDockToggleLabel.MouseButton1Click:Connect(function()
+    ToggleAimbotQuick()
+end)
+
+QuickDockAimLabel = Instance.new("TextButton")
+QuickDockAimLabel.Name = "AimLabel"
+QuickDockAimLabel.Size = UDim2.new(0.74, 0, 0.28, 0)
+QuickDockAimLabel.Position = UDim2.new(0.13, 0, 0.56, 0)
+QuickDockAimLabel.Text = Aimbot.AimPart
+QuickDockAimLabel.TextScaled = true
+QuickDockAimLabel.Font = Enum.Font.GothamSemibold
+QuickDockAimLabel.TextColor3 = Color3.fromRGB(220, 240, 255)
+QuickDockAimLabel.BackgroundTransparency = 1
+QuickDockAimLabel.AutoButtonColor = false
+QuickDockAimLabel.Parent = QuickDockButton
+QuickDockAimLabel.MouseButton1Click:Connect(function()
+    CycleAimPart()
+end)
+
+QuickDockPinLabel = Instance.new("TextButton")
+QuickDockPinLabel.Name = "PinLabel"
+QuickDockPinLabel.Size = UDim2.new(0.22, 0, 0.22, 0)
+QuickDockPinLabel.Position = UDim2.new(0.75, 0, 0.04, 0)
+QuickDockPinLabel.Text = QuickDock.Pinned and "📍" or "📌"
+QuickDockPinLabel.TextScaled = true
+QuickDockPinLabel.Font = Enum.Font.GothamBold
+QuickDockPinLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+QuickDockPinLabel.BackgroundColor3 = Color3.fromRGB(54, 92, 138)
+QuickDockPinLabel.AutoButtonColor = false
+QuickDockPinLabel.Parent = QuickDockButton
+QuickDockPinLabel.MouseButton1Click:Connect(function()
+    QuickDock.Pinned = not QuickDock.Pinned
+    UpdateQuickDockDisplay()
+end)
+
+local QuickDockPinCorner = Instance.new("UICorner")
+QuickDockPinCorner.CornerRadius = UDim.new(1, 0)
+QuickDockPinCorner.Parent = QuickDockPinLabel
+
+local QuickDockDragState = {
+    Active = false,
+    StartMouse = Vector2.zero,
+    StartPosition = UDim2.new(),
+}
+
+QuickDockButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 and not QuickDock.Pinned then
+        QuickDockDragState.Active = true
+        QuickDockDragState.StartMouse = UIS:GetMouseLocation()
+        QuickDockDragState.StartPosition = QuickDockContainer.Position
+    end
+end)
+
+QuickDockButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and QuickDockDragState.Active and not QuickDock.Pinned then
+        local delta = UIS:GetMouseLocation() - QuickDockDragState.StartMouse
+        local offsetX = QuickDockDragState.StartPosition.X.Offset + delta.X
+        local offsetY = QuickDockDragState.StartPosition.Y.Offset + delta.Y
+        QuickDock.Position = UDim2.new(QuickDockDragState.StartPosition.X.Scale, offsetX, QuickDockDragState.StartPosition.Y.Scale, offsetY)
+        QuickDockContainer.Position = QuickDock.Position
+    end
+end)
+
+QuickDockButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        QuickDockDragState.Active = false
+    end
+end)
+
+UpdateQuickDockDisplay()
 
 RunService.Heartbeat:Connect(function()
     if not Aimbot.Enabled then
@@ -800,6 +962,16 @@ TabFPS:Button({
     Callback = function()
         local TS = game:GetService("TeleportService")
         pcall(function() TS:Teleport(game.PlaceId, LocalPlayer) end)
+    end,
+})
+
+TabHome:Section({ Title = "Quick Access" })
+TabHome:Toggle({
+    Title    = "Show Aimbot Quick Button",
+    Default  = false,
+    Callback = function(v)
+        QuickDock.Enabled = v
+        UpdateQuickDockDisplay()
     end,
 })
 
