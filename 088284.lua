@@ -553,18 +553,18 @@ local function ApplyAntiAFK(v)
 end
 
 -- ==================== HOME TAB ====================
-TabHome:Section({ Title = "Pro Aim — Universal" })
-TabHome:Section({ Title = "Welcome! This script works in any Roblox FPS game.", TextSize = 13, TextTransparency = 0.35 })
-TabHome:Section({ Title = "Includes full ESP, Aimbot, crosshair, fullbright, no fog, and more.", TextSize = 13, TextTransparency = 0.4 })
+TabHome:Group({ Title = "Pro Aim — Universal" })
+TabHome:Group({ Title = "Welcome! This script works in any Roblox FPS game.", TextSize = 13, TextTransparency = 0.35 })
+TabHome:Group({ Title = "Includes full ESP, Aimbot, crosshair, fullbright, no fog, and more.", TextSize = 13, TextTransparency = 0.4 })
 TabHome:Space()
-TabHome:Section({ Title = "Quick Info" })
-TabHome:Section({ Title = "Blue and white theme with simple controls.", TextSize = 14, TextTransparency = 0.35 })
+TabHome:Group({ Title = "Quick Info" })
+TabHome:Group({ Title = "Blue and white theme with simple controls.", TextSize = 14, TextTransparency = 0.35 })
 TabHome:Space()
-TabHome:Section({ Title = "Support" })
-TabHome:Section({ Title = "For updates and feature requests, check the community links in the About tab.", TextSize = 13, TextTransparency = 0.4 })
+TabHome:Group({ Title = "Support" })
+TabHome:Group({ Title = "For updates and feature requests, check the community links in the About tab.", TextSize = 13, TextTransparency = 0.4 })
 
 -- ==================== VISUALS TAB ====================
-TabVisuals:Section({ Title = "Master" })
+TabVisuals:Group({ Title = "Master" })
 TabVisuals:Toggle({
     Title    = "Enable ESP",
     Default  = false,
@@ -576,7 +576,7 @@ TabVisuals:Toggle({
     Callback = function(v) ESP_Settings.TeamCheck = v end,
 })
 TabVisuals:Space()
-TabVisuals:Section({ Title = "Elements" })
+TabVisuals:Group({ Title = "Elements" })
 TabVisuals:Toggle({ Title="Boxes",      Default=false, Callback=function(v) ESP_Settings.Box.Enabled      = v end })
 TabVisuals:Toggle({ Title="Skeleton",   Default=false, Callback=function(v) ESP_Settings.Skeleton.Enabled = v end })
 TabVisuals:Toggle({ Title="Names",      Default=false, Callback=function(v) ESP_Settings.Name.Enabled     = v end })
@@ -585,7 +585,7 @@ TabVisuals:Toggle({ Title="Distance",   Default=false, Callback=function(v) ESP_
 TabVisuals:Toggle({ Title="Tracers",    Default=false, Callback=function(v) ESP_Settings.Tracer.Enabled   = v end })
 TabVisuals:Toggle({ Title="Box Fill",   Default=false, Callback=function(v) ESP_Settings.BoxFill.Enabled  = v end })
 TabVisuals:Space()
-TabVisuals:Section({ Title = "Settings" })
+TabVisuals:Group({ Title = "Settings" })
 TabVisuals:Slider({
     Title    = "Max Distance",
     Min      = 100, Max = 5000, Default = 2000,
@@ -599,7 +599,7 @@ TabVisuals:Dropdown({
     Callback = function(v) ESP_Settings.Tracer.Origin = v end,
 })
 TabVisuals:Space()
-TabVisuals:Section({ Title = "Chams" })
+TabVisuals:Group({ Title = "Chams" })
 TabVisuals:Toggle({
     Title    = "Enable Chams",
     Default  = false,
@@ -613,7 +613,7 @@ TabVisuals:Slider({
 })
 
 -- ==================== AIMBOT TAB ====================
-TabAimbot:Section({ Title = "Control" })
+TabAimbot:Group({ Title = "Control" })
 TabAimbot:Toggle({
     Title    = "Enable Aimbot",
     Default  = false,
@@ -645,8 +645,8 @@ TabAimbot:Toggle({
     Callback = function(v) Aimbot.Prediction = v end,
 })
 TabAimbot:Space()
-TabAimbot:Section({ Title = "Mode" })
-TabAimbot:Section({ Title = "Legit = subtle  |  Pro = faster and wider reach", TextSize = 12, TextTransparency = 0.4 })
+TabAimbot:Group({ Title = "Mode" })
+TabAimbot:Group({ Title = "Legit = subtle  |  Pro = faster and wider reach", TextSize = 12, TextTransparency = 0.4 })
 TabAimbot:Dropdown({
     Title    = "Aimbot Mode",
     Values   = {"Legit", "Pro"},
@@ -654,7 +654,7 @@ TabAimbot:Dropdown({
     Callback = function(v) AplicarModo(v) end,
 })
 TabAimbot:Space()
-TabAimbot:Section({ Title = "Settings" })
+TabAimbot:Group({ Title = "Settings" })
 TabAimbot:Dropdown({
     Title    = "Aim Part",
     Values   = {"Head","HumanoidRootPart","UpperTorso","LowerTorso"},
@@ -680,7 +680,7 @@ TabAimbot:Slider({
     Callback = function(v) Aimbot.PredictionAmount = v / 100 end,
 })
 TabAimbot:Space()
-TabAimbot:Section({ Title = "Exceptions" })
+TabAimbot:Group({ Title = "Exceptions" })
 TabAimbot:Dropdown({
     Title    = "Select Player",
     Values   = GetAimbotExceptionNames(),
@@ -710,7 +710,7 @@ TabAimbot:Button({
     end,
 })
 TabAimbot:Space()
-TabAimbot:Section({ Title = "FOV Circle" })
+TabAimbot:Group({ Title = "FOV Circle" })
 TabAimbot:Toggle({
     Title    = "Show FOV Circle",
     Default  = false,
@@ -718,7 +718,7 @@ TabAimbot:Toggle({
 })
 
 -- ==================== FPS TAB ====================
-TabFPS:Section({ Title = "Visuals" })
+TabFPS:Group({ Title = "Visuals" })
 TabFPS:Toggle({
     Title    = "Fullbright",
     Default  = false,
@@ -735,7 +735,7 @@ TabFPS:Toggle({
     Callback = function(v) FPS_S.LowGraphics = v; ApplyLowGraphics(v) end,
 })
 TabFPS:Space()
-TabFPS:Section({ Title = "Camera" })
+TabFPS:Group({ Title = "Camera" })
 TabFPS:Toggle({
     Title    = "Custom FOV",
     Default  = false,
@@ -763,7 +763,7 @@ TabFPS:Button({
     end,
 })
 TabFPS:Space()
-TabFPS:Section({ Title = "Crosshair" })
+TabFPS:Group({ Title = "Crosshair" })
 TabFPS:Toggle({
     Title    = "Enable Crosshair",
     Default  = false,
@@ -788,7 +788,7 @@ TabFPS:Slider({
     Callback = function(v) FPS_S.CrosshairThick = v; BuildCrosshair() end,
 })
 TabFPS:Space()
-TabFPS:Section({ Title = "Misc" })
+TabFPS:Group({ Title = "Misc" })
 TabFPS:Toggle({
     Title    = "Anti AFK",
     Default  = false,
@@ -894,7 +894,7 @@ LocalPlayer.CharacterAdded:Connect(function()
 end)
 
 -- ==================== CHARACTER TAB ====================
-TabCharacter:Section({ Title = "Movement" })
+TabCharacter:Group({ Title = "Movement" })
 TabCharacter:Toggle({
     Title    = "Speed Hack",
     Default  = false,
@@ -929,7 +929,7 @@ TabCharacter:Toggle({
     Callback = function(v) Char_S.InfJump = v end,
 })
 TabCharacter:Space()
-TabCharacter:Section({ Title = "Physics" })
+TabCharacter:Group({ Title = "Physics" })
 TabCharacter:Toggle({
     Title    = "NoClip",
     Default  = false,
@@ -944,7 +944,7 @@ TabCharacter:Toggle({
     end,
 })
 TabCharacter:Space()
-TabCharacter:Section({ Title = "Utility" })
+TabCharacter:Group({ Title = "Utility" })
 TabCharacter:Button({
     Title    = "Reset Character",
     Icon     = "refresh-cw",
@@ -1083,7 +1083,7 @@ task.spawn(function()
 end)
 
 -- ==================== CONFIG TAB ====================
-TabConfig:Section({ Title = "Save / Load" })
+TabConfig:Group({ Title = "Save / Load" })
 TabConfig:Button({
     Title    = "Save Config",
     Icon     = "save",
@@ -1104,7 +1104,7 @@ TabConfig:Button({
     end,
 })
 TabConfig:Space()
-TabConfig:Section({ Title = "Autoload" })
+TabConfig:Group({ Title = "Autoload" })
 TabConfig:Toggle({
     Title    = "Auto-load config on join",
     Default  = false,
@@ -1118,7 +1118,7 @@ TabConfig:Toggle({
     end,
 })
 TabConfig:Space()
-TabConfig:Section({ Title = "Reset" })
+TabConfig:Group({ Title = "Reset" })
 TabConfig:Button({
     Title    = "Delete Saved Config",
     Icon     = "trash-2",
@@ -1127,12 +1127,12 @@ TabConfig:Button({
         Notify("Config", "Config deleted.")
     end,
 })
-TabCredits:Section({ Title = "About" })
-TabCredits:Section({ Title = "Pro Aim Utility", TextSize = 14, TextTransparency = 0.3 })
+TabCredits:Group({ Title = "About" })
+TabCredits:Group({ Title = "Pro Aim Utility", TextSize = 14, TextTransparency = 0.3 })
 TabCredits:Space()
-TabCredits:Section({ Title = "UI Library" })
-TabCredits:Section({ Title = "Custom interface built for a clean blue-white layout.", TextSize = 13, TextTransparency = 0.35 })
-TabCredits:Section({ Title = "Optimized for FPS games and utility features.", TextSize = 12, TextTransparency = 0.45 })
+TabCredits:Group({ Title = "UI Library" })
+TabCredits:Group({ Title = "Custom interface built for a clean blue-white layout.", TextSize = 13, TextTransparency = 0.35 })
+TabCredits:Group({ Title = "Optimized for FPS games and utility features.", TextSize = 12, TextTransparency = 0.45 })
 
 -- ==================== FINAL ====================
 Notify("Pro Aim", "Script loaded successfully.", 5)
