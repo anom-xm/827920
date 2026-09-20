@@ -1,4 +1,4 @@
-﻿local Players            = game:GetService("Players")
+local Players            = game:GetService("Players")
 local RunService         = game:GetService("RunService")
 local UIS                = game:GetService("UserInputService")
 local CoreGui            = game:GetService("CoreGui")
@@ -15,16 +15,16 @@ local WindUI = loadstring(game:HttpGet(
 ))()
 
 WindUI:AddTheme({
-    Name        = "ZaxyRed",
-    Accent      = Color3.fromHex("#8b0000"),
-    Background  = Color3.fromHex("#0d0000"),
-    Outline     = Color3.fromHex("#cc1a1a"),
-    Text        = Color3.fromHex("#ffe0e0"),
-    Placeholder = Color3.fromHex("#b07070"),
-    Button      = Color3.fromHex("#6b0a0a"),
-    Icon        = Color3.fromHex("#ff4444"),
+    Name        = "BlueWhite",
+    Accent      = Color3.fromHex("#4aa3ff"),
+    Background  = Color3.fromHex("#081827"),
+    Outline     = Color3.fromHex("#9ed7ff"),
+    Text        = Color3.fromHex("#f5fbff"),
+    Placeholder = Color3.fromHex("#b7d9ff"),
+    Button      = Color3.fromHex("#1d6fe8"),
+    Icon        = Color3.fromHex("#d9f4ff"),
 })
-WindUI:SetTheme("ZaxyRed")
+WindUI:SetTheme("BlueWhite")
 
 local Window = WindUI:CreateWindow({
     Title               = "Pro Aim",
@@ -32,8 +32,8 @@ local Window = WindUI:CreateWindow({
     Folder              = "ProAim",
     HidePanelBackground = false,
     Background          = WindUI:Gradient({
-        ["0"]   = { Color = Color3.fromHex("#0d0000"), Transparency = 0.10 },
-        ["100"] = { Color = Color3.fromHex("#1a0000"), Transparency = 0.30 },
+        ["0"]   = { Color = Color3.fromHex("#091c2d"), Transparency = 0.10 },
+        ["100"] = { Color = Color3.fromHex("#123d69"), Transparency = 0.30 },
     }, { Rotation = 135 }),
     User = {
         Enabled   = true,
@@ -61,7 +61,7 @@ local TabAimbot    = Window:Tab({ Title = "Aimbot",    Icon = "crosshair" })
 local TabFPS       = Window:Tab({ Title = "FPS",       Icon = "zap"       })
 local TabCharacter = Window:Tab({ Title = "Character", Icon = "user"      })
 local TabConfig    = Window:Tab({ Title = "Config",    Icon = "settings"  })
-local TabCredits   = Window:Tab({ Title = "Creditos",  Icon = "heart"     })
+local TabCredits   = Window:Tab({ Title = "About",     Icon = "heart"     })
 
 -- ==================== SETTINGS INTERNOS ====================
 local ESP_Settings = {
@@ -70,16 +70,16 @@ local ESP_Settings = {
     TeamCheck     = false,
     TextSize      = 13,
     Font          = 2,
-    Box           = { Enabled = false, Color = Color3.fromRGB(220, 40, 40), Outline = true },
-    BoxFill       = { Enabled = false, Color = Color3.fromRGB(220, 40, 40), Transparency = 0.7 },
+    Box           = { Enabled = false, Color = Color3.fromRGB(94, 175, 255), Outline = true },
+    BoxFill       = { Enabled = false, Color = Color3.fromRGB(120, 200, 255), Transparency = 0.7 },
     Name          = { Enabled = false, Color = Color3.fromRGB(255, 255, 255) },
-    Distance      = { Enabled = false, Color = Color3.fromRGB(200, 180, 180) },
+    Distance      = { Enabled = false, Color = Color3.fromRGB(210, 232, 255) },
     HealthBar     = { Enabled = false },
-    Tracer        = { Enabled = false, Origin = "Bottom", Color = Color3.fromRGB(220, 40, 40) },
-    Skeleton      = { Enabled = false, Color = Color3.fromRGB(220, 40, 40), Thickness = 1 },
+    Tracer        = { Enabled = false, Origin = "Bottom", Color = Color3.fromRGB(94, 175, 255) },
+    Skeleton      = { Enabled = false, Color = Color3.fromRGB(94, 175, 255), Thickness = 1 },
     Chams         = {
         Enabled             = false,
-        FillColor           = Color3.fromRGB(180, 0, 0),
+        FillColor           = Color3.fromRGB(90, 160, 255),
         OutlineColor        = Color3.fromRGB(255, 255, 255),
         FillTransparency    = 0.5,
         OutlineTransparency = 0,
@@ -91,14 +91,17 @@ local Aimbot = {
     ToggleMode       = false,
     TeamCheck        = false,
     VisibleCheck     = false,
+    ForceFieldCheck  = false,
     AimPart          = "Head",
     FOV              = 138,
     FOV_Enabled      = false,
-    FOV_Color        = Color3.fromRGB(220, 40, 40),
-    FOV_LockedColor  = Color3.fromRGB(0, 220, 80),
+    FOV_Color        = Color3.fromRGB(94, 175, 255),
+    FOV_LockedColor  = Color3.fromRGB(160, 230, 255),
     Smoothness       = 31,
     Prediction       = false,
     PredictionAmount = 0.14,
+    Exceptions      = {},
+    ExceptionTarget  = "None",
     Modo             = "Pro",  -- "Legit", "Pro"
 }
 
@@ -116,7 +119,7 @@ local FPS_S = {
     FOVValue       = 70,
     AntiAFK        = false,
     CrosshairOn    = false,
-    CrosshairColor = Color3.fromRGB(220, 40, 40),
+    CrosshairColor = Color3.fromRGB(120, 210, 255),
     CrosshairSize  = 12,
     CrosshairGap   = 4,
     CrosshairThick = 2,
@@ -299,7 +302,7 @@ RunService.RenderStepped:Connect(function()
                 end
             end
         else
-            -- invÃ¡lido (morto, sem personagem, teammate)
+            -- inválido (morto, sem personagem, teammate)
             for k, v in pairs(Objects) do
                 if k == "SkeletonLines" then for _, l in pairs(v) do l.Visible = false end
                 elseif k == "SelectionBox" and v then v.Visible = false
@@ -355,6 +358,63 @@ local function AplicarModo(modo)
     UpdateFOV()
 end
 
+local function GetAimbotExceptionNames()
+    local names = {"None"}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(names, plr.Name)
+        end
+    end
+    return names
+end
+
+local function IsExceptionPlayer(plr)
+    if not plr then return false end
+    for _, name in ipairs(Aimbot.Exceptions) do
+        if name == plr.Name then
+            return true
+        end
+    end
+    return false
+end
+
+local function IsForceFieldProtected(plr)
+    if not plr or not plr.Character then return false end
+
+    if plr.Character:FindFirstChildOfClass("ForceField") or plr.Character:FindFirstChild("ForceField") then
+        return true
+    end
+
+    local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return false end
+
+    local spawn = Workspace:FindFirstChildOfClass("SpawnLocation")
+    if not spawn then return false end
+
+    local distToSpawn = (hrp.Position - spawn.Position).Magnitude
+    return distToSpawn <= math.max(spawn.Size.X, 8) + 4
+end
+
+local function AddException(name)
+    if not name or name == "None" then return false end
+    for _, current in ipairs(Aimbot.Exceptions) do
+        if current == name then return false end
+    end
+    table.insert(Aimbot.Exceptions, name)
+    return true
+end
+
+local function RemoveException(name)
+    if not name or name == "None" then return false end
+    for i, current in ipairs(Aimbot.Exceptions) do
+        if current == name then
+            table.remove(Aimbot.Exceptions, i)
+            return true
+        end
+    end
+    return false
+end
+
 local function GetTarget()
     local closest = nil
     local bestDist = Aimbot.FOV
@@ -362,6 +422,8 @@ local function GetTarget()
     for _, plr in Players:GetPlayers() do
         if plr == LocalPlayer or not plr.Character or plr.Character:FindFirstChild("Humanoid").Health <= 0 then continue end
         if Aimbot.TeamCheck and plr.Team == LocalPlayer.Team then continue end
+        if IsExceptionPlayer(plr) then continue end
+        if Aimbot.ForceFieldCheck and IsForceFieldProtected(plr) then continue end
 
         local part = plr.Character:FindFirstChild(Aimbot.AimPart) or plr.Character:FindFirstChild("HumanoidRootPart")
         if not part then continue end
@@ -490,46 +552,55 @@ local function ApplyAntiAFK(v)
     end
 end
 
--- ==================== ABA HOME ====================
-TabHome:Group({ Title = "Pro Aim â€” Universal" })
-TabHome:Group({ Title = "Bem-vindo! Este script funciona em qualquer jogo FPS no Roblox.", TextSize = 13, TextTransparency = 0.35 })
-TabHome:Group({ Title = "Inclui ESP completo, Aimbot, Crosshair, Fullbright, No Fog e muito mais.", TextSize = 13, TextTransparency = 0.4 })
-TabHome:Space()
-TabHome:Group({ Title = "Desenvolvedor" })
-TabHome:Group({ Title = "Script feito por  Zaxy.Hex", TextSize = 14, TextTransparency = 0.35 })
-TabHome:Button({
-    Title = "Copiar nome do criador",
-    Icon  = "copy",
-    Callback = function()
-        pcall(function() setclipboard("Zaxy.Hex") end)
-        Notify("Copiado!", "Zaxy.Hex copiado!")
-    end,
+-- ==================== HOME TAB ====================
+local HomeGroup = TabHome:Group({})
+HomeGroup:Section({
+    Title = "Pro Aim — Universal",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
+HomeGroup:Section({
+    Title = "Welcome!",
+    Desc = "This script works in any Roblox FPS game.",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
+HomeGroup:Section({
+    Title = "Features",
+    Desc = "Includes full ESP, Aimbot, crosshair, fullbright, no fog, and more.",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
 })
 TabHome:Space()
-TabHome:Group({ Title = "TikTok" })
-TabHome:Group({ Title = "@Zaxy.Hex â€” me segue pra pegar updates primeiro!", TextSize = 13, TextTransparency = 0.4 })
-TabHome:Button({
-    Title = "Copiar @ TikTok",
-    Icon  = "copy",
-    Callback = function()
-        pcall(function() setclipboard("@Zaxy.Hex") end)
-        Notify("Copiado!", "@Zaxy.Hex copiado!")
-    end,
+local QuickInfoGroup = TabHome:Group({})
+QuickInfoGroup:Section({
+    Title = "Quick Info",
+    Desc = "Blue and white theme with simple controls.",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
 })
 TabHome:Space()
-TabHome:Group({ Title = "Discord" })
-TabHome:Group({ Title = "discord.gg/WudTSxveBc", TextSize = 13, TextTransparency = 0.35 })
-TabHome:Button({
-    Title = "Copiar link do Discord",
-    Icon  = "copy",
-    Callback = function()
-        pcall(function() setclipboard("https://discord.gg/WudTSxveBc") end)
-        Notify("Copiado!", "Link do Discord copiado!")
-    end,
+local SupportGroup = TabHome:Group({})
+SupportGroup:Section({
+    Title = "Support",
+    Desc = "For updates and feature requests, check the community links in the About tab.",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
 })
 
--- ==================== ABA VISUALS ====================
-TabVisuals:Group({ Title = "Master" })
+-- ==================== VISUALS TAB ====================
+local VisualsMain = TabVisuals:Group({})
+VisualsMain:Section({
+    Title = "Master",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabVisuals:Toggle({
     Title    = "Enable ESP",
     Default  = false,
@@ -541,7 +612,13 @@ TabVisuals:Toggle({
     Callback = function(v) ESP_Settings.TeamCheck = v end,
 })
 TabVisuals:Space()
-TabVisuals:Group({ Title = "Elementos" })
+local VisualsElements = TabVisuals:Group({})
+VisualsElements:Section({
+    Title = "Elements",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabVisuals:Toggle({ Title="Boxes",      Default=false, Callback=function(v) ESP_Settings.Box.Enabled      = v end })
 TabVisuals:Toggle({ Title="Skeleton",   Default=false, Callback=function(v) ESP_Settings.Skeleton.Enabled = v end })
 TabVisuals:Toggle({ Title="Names",      Default=false, Callback=function(v) ESP_Settings.Name.Enabled     = v end })
@@ -550,7 +627,13 @@ TabVisuals:Toggle({ Title="Distance",   Default=false, Callback=function(v) ESP_
 TabVisuals:Toggle({ Title="Tracers",    Default=false, Callback=function(v) ESP_Settings.Tracer.Enabled   = v end })
 TabVisuals:Toggle({ Title="Box Fill",   Default=false, Callback=function(v) ESP_Settings.BoxFill.Enabled  = v end })
 TabVisuals:Space()
-TabVisuals:Group({ Title = "Configuracoes" })
+local VisualsSettings = TabVisuals:Group({})
+VisualsSettings:Section({
+    Title = "Settings",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabVisuals:Slider({
     Title    = "Max Distance",
     Min      = 100, Max = 5000, Default = 2000,
@@ -564,21 +647,33 @@ TabVisuals:Dropdown({
     Callback = function(v) ESP_Settings.Tracer.Origin = v end,
 })
 TabVisuals:Space()
-TabVisuals:Group({ Title = "Chams" })
+local VisualsChams = TabVisuals:Group({})
+VisualsChams:Section({
+    Title = "Chams",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabVisuals:Toggle({
     Title    = "Enable Chams",
     Default  = false,
     Callback = function(v) ESP_Settings.Chams.Enabled = v end,
 })
 TabVisuals:Slider({
-    Title    = "Chams Transparencia",
+    Title    = "Chams Transparency",
     Min      = 0, Max = 100, Default = 50,
     Suffix   = "%",
     Callback = function(v) ESP_Settings.Chams.FillTransparency = v / 100 end,
 })
 
--- ==================== ABA AIMBOT ====================
-TabAimbot:Group({ Title = "Controle" })
+-- ==================== AIMBOT TAB ====================
+local AimbotControl = TabAimbot:Group({})
+AimbotControl:Section({
+    Title = "Control",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabAimbot:Toggle({
     Title    = "Enable Aimbot",
     Default  = false,
@@ -600,21 +695,38 @@ TabAimbot:Toggle({
     Callback = function(v) Aimbot.VisibleCheck = v end,
 })
 TabAimbot:Toggle({
+    Title    = "Force Field Check (Spawn Protection Check)",
+    Default  = false,
+    Callback = function(v) Aimbot.ForceFieldCheck = v end,
+})
+TabAimbot:Toggle({
     Title    = "Prediction",
     Default  = false,
     Callback = function(v) Aimbot.Prediction = v end,
 })
 TabAimbot:Space()
-TabAimbot:Group({ Title = "Modo" })
-TabAimbot:Group({ Title = "Legit = sutil  |  Pro = rapido e alcance maior", TextSize = 12, TextTransparency = 0.4 })
+local AimbotMode = TabAimbot:Group({})
+AimbotMode:Section({
+    Title = "Mode",
+    Desc = "Legit = subtle | Pro = faster and wider reach",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabAimbot:Dropdown({
-    Title    = "Modo do Aimbot",
+    Title    = "Aimbot Mode",
     Values   = {"Legit", "Pro"},
     Default  = "Pro",
     Callback = function(v) AplicarModo(v) end,
 })
 TabAimbot:Space()
-TabAimbot:Group({ Title = "Configuracoes" })
+local AimbotSettings = TabAimbot:Group({})
+AimbotSettings:Section({
+    Title = "Settings",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabAimbot:Dropdown({
     Title    = "Aim Part",
     Values   = {"Head","HumanoidRootPart","UpperTorso","LowerTorso"},
@@ -630,7 +742,7 @@ TabAimbot:Slider({
 TabAimbot:Slider({
     Title    = "Smoothness",
     Value    = { Min = 1, Max = 50, Default = 0 },
-    Suffix   = " (menor = mais suave)",
+    Suffix   = " (lower = smoother)",
     Callback = function(v) Aimbot.Smoothness = v end,
 })
 TabAimbot:Slider({
@@ -640,15 +752,63 @@ TabAimbot:Slider({
     Callback = function(v) Aimbot.PredictionAmount = v / 100 end,
 })
 TabAimbot:Space()
-TabAimbot:Group({ Title = "FOV Circle" })
+local AimbotExceptionGroup = TabAimbot:Group({})
+AimbotExceptionGroup:Section({
+    Title = "Exceptions",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
+TabAimbot:Dropdown({
+    Title    = "Select Player",
+    Values   = GetAimbotExceptionNames(),
+    Default  = "None",
+    Callback = function(v) Aimbot.ExceptionTarget = v end,
+})
+TabAimbot:Button({
+    Title    = "Add Exception",
+    Icon     = "plus",
+    Callback = function()
+        if AddException(Aimbot.ExceptionTarget) then
+            Notify("Aimbot", Aimbot.ExceptionTarget .. " will be ignored.")
+        else
+            Notify("Aimbot", Aimbot.ExceptionTarget == "None" and "Select a player first." or "Player already ignored.")
+        end
+    end,
+})
+TabAimbot:Button({
+    Title    = "Remove Exception",
+    Icon     = "minus",
+    Callback = function()
+        if RemoveException(Aimbot.ExceptionTarget) then
+            Notify("Aimbot", Aimbot.ExceptionTarget .. " removed from exceptions.")
+        else
+            Notify("Aimbot", Aimbot.ExceptionTarget == "None" and "Select a player first." or "Player not in exceptions.")
+        end
+    end,
+})
+TabAimbot:Space()
+local AimbotFOVGroup = TabAimbot:Group({})
+AimbotFOVGroup:Section({
+    Title = "FOV Circle",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabAimbot:Toggle({
     Title    = "Show FOV Circle",
     Default  = false,
     Callback = function(v) Aimbot.FOV_Enabled = v; UpdateFOV() end,
 })
 
--- ==================== ABA FPS ====================
-TabFPS:Group({ Title = "Visuais" })
+-- ==================== FPS TAB ====================
+local FPSVisuals = TabFPS:Group({})
+FPSVisuals:Section({
+    Title = "Visuals",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabFPS:Toggle({
     Title    = "Fullbright",
     Default  = false,
@@ -660,12 +820,18 @@ TabFPS:Toggle({
     Callback = function(v) FPS_S.NoFog = v; ApplyNoFog(v) end,
 })
 TabFPS:Toggle({
-    Title    = "Low Graphics (mais FPS)",
+    Title    = "Low Graphics (more FPS)",
     Default  = false,
     Callback = function(v) FPS_S.LowGraphics = v; ApplyLowGraphics(v) end,
 })
 TabFPS:Space()
-TabFPS:Group({ Title = "Camera" })
+local FPSCamera = TabFPS:Group({})
+FPSCamera:Section({
+    Title = "Camera",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabFPS:Toggle({
     Title    = "Custom FOV",
     Default  = false,
@@ -678,7 +844,7 @@ TabFPS:Toggle({
 TabFPS:Slider({
     Title    = "FOV Value",
     Value    = { Min = 50, Max = 120, Default = 70 },
-    Suffix   = "Â°",
+    Suffix   = "°",
     Callback = function(v)
         FPS_S.FOVValue = v
         if FPS_S.CustomFOV then Camera.FieldOfView = v end
@@ -689,18 +855,24 @@ TabFPS:Button({
     Icon     = "rotate-ccw",
     Callback = function()
         Camera.FieldOfView = 70
-        Notify("Camera", "FOV resetado para 70")
+        Notify("Camera", "FOV reset to 70")
     end,
 })
 TabFPS:Space()
-TabFPS:Group({ Title = "Crosshair" })
+local FPSCrosshair = TabFPS:Group({})
+FPSCrosshair:Section({
+    Title = "Crosshair",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabFPS:Toggle({
     Title    = "Enable Crosshair",
     Default  = false,
     Callback = function(v) FPS_S.CrosshairOn = v; BuildCrosshair() end,
 })
 TabFPS:Slider({
-    Title    = "Tamanho",
+    Title    = "Size",
     Value    = { Min = 4, Max = 30, Default = 12 },
     Suffix   = "px",
     Callback = function(v) FPS_S.CrosshairSize = v; BuildCrosshair() end,
@@ -712,13 +884,19 @@ TabFPS:Slider({
     Callback = function(v) FPS_S.CrosshairGap = v; BuildCrosshair() end,
 })
 TabFPS:Slider({
-    Title    = "Espessura",
+    Title    = "Thickness",
     Value    = { Min = 1, Max = 6, Default = 2 },
     Suffix   = "px",
     Callback = function(v) FPS_S.CrosshairThick = v; BuildCrosshair() end,
 })
 TabFPS:Space()
-TabFPS:Group({ Title = "Misc" })
+local FPSMisc = TabFPS:Group({})
+FPSMisc:Section({
+    Title = "Misc",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabFPS:Toggle({
     Title    = "Anti AFK",
     Default  = false,
@@ -733,7 +911,7 @@ TabFPS:Button({
     end,
 })
 
--- ==================== ABA CHARACTER â€” ENGINE ====================
+-- ==================== ABA CHARACTER — ENGINE ====================
 local Char_S = {
     Speed        = false, SpeedValue  = 16,
     Jump         = false, JumpValue   = 50,
@@ -823,15 +1001,21 @@ LocalPlayer.CharacterAdded:Connect(function()
     if Char_S.Fly   then StartFly()       end
 end)
 
--- ==================== ABA CHARACTER â€” UI ====================
-TabCharacter:Group({ Title = "Movimento" })
+-- ==================== CHARACTER TAB ====================
+local CharacterMovement = TabCharacter:Group({})
+CharacterMovement:Section({
+    Title = "Movement",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabCharacter:Toggle({
     Title    = "Speed Hack",
     Default  = false,
     Callback = function(v) Char_S.Speed = v; ApplySpeed(v) end,
 })
 TabCharacter:Slider({
-    Title    = "Velocidade",
+    Title    = "Speed",
     Value    = { Min = 16, Max = 250, Default = 50 },
     Suffix   = " ws",
     Callback = function(v)
@@ -859,7 +1043,13 @@ TabCharacter:Toggle({
     Callback = function(v) Char_S.InfJump = v end,
 })
 TabCharacter:Space()
-TabCharacter:Group({ Title = "Fisica" })
+local CharacterPhysics = TabCharacter:Group({})
+CharacterPhysics:Section({
+    Title = "Physics",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabCharacter:Toggle({
     Title    = "NoClip",
     Default  = false,
@@ -874,7 +1064,13 @@ TabCharacter:Toggle({
     end,
 })
 TabCharacter:Space()
-TabCharacter:Group({ Title = "Util" })
+local CharacterUtility = TabCharacter:Group({})
+CharacterUtility:Section({
+    Title = "Utility",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabCharacter:Button({
     Title    = "Reset Character",
     Icon     = "refresh-cw",
@@ -884,7 +1080,7 @@ TabCharacter:Button({
     end,
 })
 TabCharacter:Button({
-    Title    = "Teleportar pra Spawn",
+    Title    = "Teleport to Spawn",
     Icon     = "map-pin",
     Callback = function()
         local spawn = Workspace:FindFirstChildOfClass("SpawnLocation")
@@ -895,7 +1091,7 @@ TabCharacter:Button({
     end,
 })
 
--- ==================== ABA CONFIG â€” ENGINE ====================
+-- ==================== CONFIG ENGINE ====================
 local CONFIG_PATH = "ProAim/config.json"
 local AUTOLOAD    = false
 
@@ -914,16 +1110,18 @@ local function SerializarConfig()
             TeamCheck     = ESP_Settings.TeamCheck,
         },
         Aimbot = {
-            Enabled      = Aimbot.Enabled,
-            ToggleMode   = Aimbot.ToggleMode,
-            TeamCheck    = Aimbot.TeamCheck,
-            VisibleCheck = Aimbot.VisibleCheck,
-            Prediction   = Aimbot.Prediction,
-            AimPart      = Aimbot.AimPart,
-            FOV          = Aimbot.FOV,
-            Smoothness   = Aimbot.Smoothness,
-            FOV_Enabled  = Aimbot.FOV_Enabled,
-            Modo         = Aimbot.Modo,
+            Enabled          = Aimbot.Enabled,
+            ToggleMode       = Aimbot.ToggleMode,
+            TeamCheck        = Aimbot.TeamCheck,
+            VisibleCheck     = Aimbot.VisibleCheck,
+            ForceFieldCheck  = Aimbot.ForceFieldCheck,
+            Prediction       = Aimbot.Prediction,
+            AimPart          = Aimbot.AimPart,
+            FOV              = Aimbot.FOV,
+            Smoothness       = Aimbot.Smoothness,
+            FOV_Enabled      = Aimbot.FOV_Enabled,
+            Exceptions       = Aimbot.Exceptions,
+            Modo             = Aimbot.Modo,
         },
         FPS = {
             Fullbright   = FPS_S.Fullbright,
@@ -949,12 +1147,12 @@ local function SalvarConfig()
         if not isfolder("ProAim") then makefolder("ProAim") end
         writefile(CONFIG_PATH, SerializarConfig())
     end)
-    if ok then Notify("Config", "ConfiguraÃ§Ã£o salva!") else Notify("Erro", "Falhou ao salvar: " .. tostring(err)) end
+    if ok then Notify("Config", "Configuration saved!") else Notify("Error", "Failed to save: " .. tostring(err)) end
 end
 
 local function CarregarConfig()
     local ok, err = pcall(function()
-        if not isfile(CONFIG_PATH) then Notify("Config", "Nenhuma config salva ainda."); return end
+        if not isfile(CONFIG_PATH) then Notify("Config", "No saved config yet."); return end
         local data = HttpService:JSONDecode(readfile(CONFIG_PATH))
 
         if data.ESP then
@@ -970,16 +1168,18 @@ local function CarregarConfig()
             ESP_Settings.TeamCheck         = data.ESP.TeamCheck or false
         end
         if data.Aimbot then
-            Aimbot.Enabled      = data.Aimbot.Enabled      or false
-            Aimbot.ToggleMode   = data.Aimbot.ToggleMode   or false
-            Aimbot.TeamCheck    = data.Aimbot.TeamCheck    or false
-            Aimbot.VisibleCheck = data.Aimbot.VisibleCheck or false
-            Aimbot.Prediction   = data.Aimbot.Prediction   or false
-            Aimbot.AimPart      = data.Aimbot.AimPart      or "Head"
-            Aimbot.FOV          = data.Aimbot.FOV          or 160
-            Aimbot.Smoothness   = data.Aimbot.Smoothness   or 10
-            Aimbot.FOV_Enabled  = data.Aimbot.FOV_Enabled  or false
-            Aimbot.Modo         = data.Aimbot.Modo         or "Pro"
+            Aimbot.Enabled         = data.Aimbot.Enabled         or false
+            Aimbot.ToggleMode      = data.Aimbot.ToggleMode      or false
+            Aimbot.TeamCheck       = data.Aimbot.TeamCheck       or false
+            Aimbot.VisibleCheck    = data.Aimbot.VisibleCheck    or false
+            Aimbot.ForceFieldCheck = data.Aimbot.ForceFieldCheck or false
+            Aimbot.Prediction      = data.Aimbot.Prediction      or false
+            Aimbot.AimPart         = data.Aimbot.AimPart         or "Head"
+            Aimbot.FOV             = data.Aimbot.FOV             or 160
+            Aimbot.Smoothness      = data.Aimbot.Smoothness      or 10
+            Aimbot.FOV_Enabled     = data.Aimbot.FOV_Enabled     or false
+            Aimbot.Exceptions      = data.Aimbot.Exceptions      or {}
+            Aimbot.Modo            = data.Aimbot.Modo            or "Pro"
         end
         if data.FPS then
             if data.FPS.Fullbright  then ApplyFullbright(true)  end
@@ -997,42 +1197,54 @@ local function CarregarConfig()
             if data.Character.Speed then Char_S.Speed = true; ApplySpeed(true) end
             if data.Character.Jump  then Char_S.Jump  = true; ApplyJump(true)  end
         end
-        Notify("Config", "ConfiguraÃ§Ã£o carregada!")
+        Notify("Config", "Configuration loaded!")
     end)
-    if not ok then Notify("Erro", "Falhou ao carregar: " .. tostring(err)) end
+    if not ok then Notify("Error", "Failed to load: " .. tostring(err)) end
 end
 
--- Autoload ao iniciar se tiver config salva
+-- Auto-load on startup if a saved config exists
 task.spawn(function()
     task.wait(1)
     if AUTOLOAD then CarregarConfig() end
 end)
 
--- ==================== ABA CONFIG â€” UI ====================
-TabConfig:Group({ Title = "Salvar / Carregar" })
+-- ==================== CONFIG TAB ====================
+local ConfigSaveLoad = TabConfig:Group({})
+ConfigSaveLoad:Section({
+    Title = "Save / Load",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabConfig:Button({
-    Title    = "Salvar Config",
+    Title    = "Save Config",
     Icon     = "save",
     Callback = SalvarConfig,
 })
 TabConfig:Button({
-    Title    = "Carregar Config",
+    Title    = "Load Config",
     Icon     = "folder-open",
     Callback = CarregarConfig,
 })
 TabConfig:Button({
-    Title    = "Exportar (Clipboard)",
+    Title    = "Export (Clipboard)",
     Icon     = "copy",
     Callback = function()
         local json = SerializarConfig()
         pcall(function() setclipboard(json) end)
-        Notify("Config", "Config copiada pro clipboard!")
+        Notify("Config", "Config copied to clipboard!")
     end,
 })
 TabConfig:Space()
-TabConfig:Group({ Title = "Autoload" })
+local ConfigAutoLoad = TabConfig:Group({})
+ConfigAutoLoad:Section({
+    Title = "Autoload",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabConfig:Toggle({
-    Title    = "Auto carregar config ao entrar",
+    Title    = "Auto-load config on join",
     Default  = false,
     Callback = function(v)
         AUTOLOAD = v
@@ -1040,59 +1252,48 @@ TabConfig:Toggle({
             if not isfolder("ProAim") then makefolder("ProAim") end
             writefile("ProAim/autoload.txt", v and "true" or "false")
         end)
-        Notify("Autoload", v and "Ativado! Config serÃ¡ carregada automaticamente." or "Desativado.")
+        Notify("Autoload", v and "Enabled! The config will load automatically." or "Disabled.")
     end,
 })
 TabConfig:Space()
-TabConfig:Group({ Title = "Reset" })
+local ConfigReset = TabConfig:Group({})
+ConfigReset:Section({
+    Title = "Reset",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
 TabConfig:Button({
-    Title    = "Deletar Config Salva",
+    Title    = "Delete Saved Config",
     Icon     = "trash-2",
     Callback = function()
         pcall(function() delfile(CONFIG_PATH) end)
-        Notify("Config", "Config deletada.")
+        Notify("Config", "Config deleted.")
     end,
 })
-TabCredits:Group({ Title = "Desenvolvedor" })
-TabCredits:Group({ Title = "Script feito por Zaxy.Hex  â€”  Pro Aim", TextSize = 14, TextTransparency = 0.3 })
-TabCredits:Space()
-TabCredits:Group({ Title = "TikTok" })
-TabCredits:Group({ Title = "@Zaxy.Hex", TextSize = 13, TextTransparency = 0.35 })
-TabCredits:Button({
-    Title = "Copiar @ TikTok",
-    Icon  = "copy",
-    Callback = function()
-        pcall(function() setclipboard("@Zaxy.Hex") end)
-        Notify("Copiado!", "@Zaxy.Hex copiado!")
-    end,
+local CreditsMain = TabCredits:Group({})
+CreditsMain:Section({
+    Title = "About",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
+})
+CreditsMain:Section({
+    Title = "Pro Aim Utility",
+    Desc = "Custom interface built for a clean blue-white layout.",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
 })
 TabCredits:Space()
-TabCredits:Group({ Title = "Discord" })
-TabCredits:Group({ Title = "discord.gg/WudTSxveBc", TextSize = 13, TextTransparency = 0.35 })
-TabCredits:Button({
-    Title = "Copiar Link do Discord",
-    Icon  = "copy",
-    Callback = function()
-        pcall(function() setclipboard("https://discord.gg/WudTSxveBc") end)
-        Notify("Copiado!", "Link do Discord copiado!")
-    end,
+local CreditsLib = TabCredits:Group({})
+CreditsLib:Section({
+    Title = "UI Library",
+    Desc = "Optimized for FPS games and utility features.",
+    Box = true,
+    BoxBorder = true,
+    Opened = true,
 })
-TabCredits:Space()
-TabCredits:Group({ Title = "Roblox" })
-TabCredits:Group({ Title = "Username: KHVVKUB", TextSize = 13, TextTransparency = 0.35 })
-TabCredits:Button({
-    Title = "Copiar Username Roblox",
-    Icon  = "copy",
-    Callback = function()
-        pcall(function() setclipboard("KHVVKUB") end)
-        Notify("Copiado!", "Username copiado!")
-    end,
-})
-TabCredits:Space()
-TabCredits:Group({ Title = "UI Library" })
-TabCredits:Group({ Title = "Interface: WindUI por Footagesus", TextSize = 13, TextTransparency = 0.35 })
-TabCredits:Group({ Title = "github.com/Footagesus/WindUI", TextSize = 12, TextTransparency = 0.45 })
 
--- ==================== FINALIZACAO ====================
-Notify("Pro Aim", "Script carregado! by Zaxy.Hex", 5)
-
+-- ==================== FINAL ====================
+Notify("Pro Aim", "Script loaded successfully.", 5)

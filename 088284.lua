@@ -138,7 +138,6 @@ end
 local function CreateESP(Player)
     local Objects = {
         Box = NewDrawing("Square", {Thickness = 1, ZIndex = 2, Visible = false}),
-        BoxOutline = NewDrawing("Square", {Thickness = 3, Color = Color3.new(0,0,0), ZIndex = 1, Visible = false}),
         BoxFill = NewDrawing("Square", {Filled = true, ZIndex = 0, Visible = false}),
         Name = NewDrawing("Text", {Text = Player.Name, Center = true, Size = ESP_Settings.TextSize, Font = ESP_Settings.Font, Outline = true, ZIndex = 3, Visible = false}),
         Distance = NewDrawing("Text", {Center = true, Size = ESP_Settings.TextSize - 1, Font = ESP_Settings.Font, Outline = true, ZIndex = 3, Visible = false}),
@@ -918,7 +917,6 @@ local Char_S = {
     Fly          = false,
     NoClip       = false,
     InfJump      = false,
-    AntiRagdoll  = false,
 }
 
 -- Speed / Jump aplicados via Humanoid
