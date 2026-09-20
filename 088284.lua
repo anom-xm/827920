@@ -99,6 +99,8 @@ local Aimbot = {
     Smoothness       = 31,
     Prediction       = false,
     PredictionAmount = 0.14,
+    Exceptions      = {},
+    ExceptionTarget  = "None",
     Modo             = "Pro",  -- "Legit", "Pro"
 }
 
@@ -355,6 +357,46 @@ local function AplicarModo(modo)
     UpdateFOV()
 end
 
+local function GetAimbotExceptionNames()
+    local names = {"None"}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(names, plr.Name)
+        end
+    end
+    return names
+end
+
+local function IsExceptionPlayer(plr)
+    if not plr then return false end
+    for _, name in ipairs(Aimbot.Exceptions) do
+        if name == plr.Name then
+            return true
+        end
+    end
+    return false
+end
+
+local function AddException(name)
+    if not name or name == "None" then return false end
+    for _, current in ipairs(Aimbot.Exceptions) do
+        if current == name then return false end
+    end
+    table.insert(Aimbot.Exceptions, name)
+    return true
+end
+
+local function RemoveException(name)
+    if not name or name == "None" then return false end
+    for i, current in ipairs(Aimbot.Exceptions) do
+        if current == name then
+            table.remove(Aimbot.Exceptions, i)
+            return true
+        end
+    end
+    return false
+end
+
 local function GetTarget()
     local closest = nil
     local bestDist = Aimbot.FOV
@@ -362,6 +404,7 @@ local function GetTarget()
     for _, plr in Players:GetPlayers() do
         if plr == LocalPlayer or not plr.Character or plr.Character:FindFirstChild("Humanoid").Health <= 0 then continue end
         if Aimbot.TeamCheck and plr.Team == LocalPlayer.Team then continue end
+        if IsExceptionPlayer(plr) then continue end
 
         local part = plr.Character:FindFirstChild(Aimbot.AimPart) or plr.Character:FindFirstChild("HumanoidRootPart")
         if not part then continue end
@@ -611,6 +654,36 @@ TabAimbot:Slider({
     Value    = { Min = 1, Max = 50, Default = 14 },
     Suffix   = "%",
     Callback = function(v) Aimbot.PredictionAmount = v / 100 end,
+})
+TabAimbot:Space()
+TabAimbot:Section({ Title = "Exceptions" })
+TabAimbot:Dropdown({
+    Title    = "Select Player",
+    Values   = GetAimbotExceptionNames(),
+    Default  = "None",
+    Callback = function(v) Aimbot.ExceptionTarget = v end,
+})
+TabAimbot:Button({
+    Title    = "Add Exception",
+    Icon     = "plus",
+    Callback = function()
+        if AddException(Aimbot.ExceptionTarget) then
+            Notify("Aimbot", Aimbot.ExceptionTarget .. " will be ignored.")
+        else
+            Notify("Aimbot", Aimbot.ExceptionTarget == "None" and "Select a player first." or "Player already ignored.")
+        end
+    end,
+})
+TabAimbot:Button({
+    Title    = "Remove Exception",
+    Icon     = "minus",
+    Callback = function()
+        if RemoveException(Aimbot.ExceptionTarget) then
+            Notify("Aimbot", Aimbot.ExceptionTarget .. " removed from exceptions.")
+        else
+            Notify("Aimbot", Aimbot.ExceptionTarget == "None" and "Select a player first." or "Player not in exceptions.")
+        end
+    end,
 })
 TabAimbot:Space()
 TabAimbot:Section({ Title = "FOV Circle" })
@@ -896,6 +969,7 @@ local function SerializarConfig()
             FOV          = Aimbot.FOV,
             Smoothness   = Aimbot.Smoothness,
             FOV_Enabled  = Aimbot.FOV_Enabled,
+            Exceptions   = Aimbot.Exceptions,
             Modo         = Aimbot.Modo,
         },
         FPS = {
@@ -952,6 +1026,7 @@ local function CarregarConfig()
             Aimbot.FOV          = data.Aimbot.FOV          or 160
             Aimbot.Smoothness   = data.Aimbot.Smoothness   or 10
             Aimbot.FOV_Enabled  = data.Aimbot.FOV_Enabled  or false
+            Aimbot.Exceptions   = data.Aimbot.Exceptions   or {}
             Aimbot.Modo         = data.Aimbot.Modo         or "Pro"
         end
         if data.FPS then

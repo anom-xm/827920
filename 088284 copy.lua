@@ -1094,4 +1094,4 @@ TabCredits:Section({ Title = "Interface: WindUI por Footagesus", TextSize = 13, 
 TabCredits:Section({ Title = "github.com/Footagesus/WindUI", TextSize = 12, TextTransparency = 0.45 })
 
 -- ==================== FINALIZACAO ====================
-Notify("Pro Aim", "Script carregado! by Zaxy.Hex", 5)ZZ
+Notify("Pro Aim", "Script carregado! by Zaxy.Hex", 5)
