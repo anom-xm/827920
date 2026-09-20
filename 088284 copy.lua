@@ -15,16 +15,16 @@ local WindUI = loadstring(game:HttpGet(
 ))()
 
 WindUI:AddTheme({
-    Name        = "BlueWhite",
-    Accent      = Color3.fromHex("#4aa3ff"),
-    Background  = Color3.fromHex("#081827"),
-    Outline     = Color3.fromHex("#9ed7ff"),
-    Text        = Color3.fromHex("#f5fbff"),
-    Placeholder = Color3.fromHex("#b7d9ff"),
-    Button      = Color3.fromHex("#1d6fe8"),
-    Icon        = Color3.fromHex("#d9f4ff"),
+    Name        = "ZaxyRed",
+    Accent      = Color3.fromHex("#8b0000"),
+    Background  = Color3.fromHex("#0d0000"),
+    Outline     = Color3.fromHex("#cc1a1a"),
+    Text        = Color3.fromHex("#ffe0e0"),
+    Placeholder = Color3.fromHex("#b07070"),
+    Button      = Color3.fromHex("#6b0a0a"),
+    Icon        = Color3.fromHex("#ff4444"),
 })
-WindUI:SetTheme("BlueWhite")
+WindUI:SetTheme("ZaxyRed")
 
 local Window = WindUI:CreateWindow({
     Title               = "Pro Aim",
@@ -32,8 +32,8 @@ local Window = WindUI:CreateWindow({
     Folder              = "ProAim",
     HidePanelBackground = false,
     Background          = WindUI:Gradient({
-        ["0"]   = { Color = Color3.fromHex("#091c2d"), Transparency = 0.10 },
-        ["100"] = { Color = Color3.fromHex("#123d69"), Transparency = 0.30 },
+        ["0"]   = { Color = Color3.fromHex("#0d0000"), Transparency = 0.10 },
+        ["100"] = { Color = Color3.fromHex("#1a0000"), Transparency = 0.30 },
     }, { Rotation = 135 }),
     User = {
         Enabled   = true,
@@ -61,7 +61,7 @@ local TabAimbot    = Window:Tab({ Title = "Aimbot",    Icon = "crosshair" })
 local TabFPS       = Window:Tab({ Title = "FPS",       Icon = "zap"       })
 local TabCharacter = Window:Tab({ Title = "Character", Icon = "user"      })
 local TabConfig    = Window:Tab({ Title = "Config",    Icon = "settings"  })
-local TabCredits   = Window:Tab({ Title = "About",     Icon = "heart"     })
+local TabCredits   = Window:Tab({ Title = "Creditos",  Icon = "heart"     })
 
 -- ==================== SETTINGS INTERNOS ====================
 local ESP_Settings = {
@@ -70,16 +70,16 @@ local ESP_Settings = {
     TeamCheck     = false,
     TextSize      = 13,
     Font          = 2,
-    Box           = { Enabled = false, Color = Color3.fromRGB(94, 175, 255), Outline = true },
-    BoxFill       = { Enabled = false, Color = Color3.fromRGB(120, 200, 255), Transparency = 0.7 },
+    Box           = { Enabled = false, Color = Color3.fromRGB(220, 40, 40), Outline = true },
+    BoxFill       = { Enabled = false, Color = Color3.fromRGB(220, 40, 40), Transparency = 0.7 },
     Name          = { Enabled = false, Color = Color3.fromRGB(255, 255, 255) },
-    Distance      = { Enabled = false, Color = Color3.fromRGB(210, 232, 255) },
+    Distance      = { Enabled = false, Color = Color3.fromRGB(200, 180, 180) },
     HealthBar     = { Enabled = false },
-    Tracer        = { Enabled = false, Origin = "Bottom", Color = Color3.fromRGB(94, 175, 255) },
-    Skeleton      = { Enabled = false, Color = Color3.fromRGB(94, 175, 255), Thickness = 1 },
+    Tracer        = { Enabled = false, Origin = "Bottom", Color = Color3.fromRGB(220, 40, 40) },
+    Skeleton      = { Enabled = false, Color = Color3.fromRGB(220, 40, 40), Thickness = 1 },
     Chams         = {
         Enabled             = false,
-        FillColor           = Color3.fromRGB(90, 160, 255),
+        FillColor           = Color3.fromRGB(180, 0, 0),
         OutlineColor        = Color3.fromRGB(255, 255, 255),
         FillTransparency    = 0.5,
         OutlineTransparency = 0,
@@ -94,8 +94,8 @@ local Aimbot = {
     AimPart          = "Head",
     FOV              = 138,
     FOV_Enabled      = false,
-    FOV_Color        = Color3.fromRGB(94, 175, 255),
-    FOV_LockedColor  = Color3.fromRGB(160, 230, 255),
+    FOV_Color        = Color3.fromRGB(220, 40, 40),
+    FOV_LockedColor  = Color3.fromRGB(0, 220, 80),
     Smoothness       = 31,
     Prediction       = false,
     PredictionAmount = 0.14,
@@ -116,7 +116,7 @@ local FPS_S = {
     FOVValue       = 70,
     AntiAFK        = false,
     CrosshairOn    = false,
-    CrosshairColor = Color3.fromRGB(120, 210, 255),
+    CrosshairColor = Color3.fromRGB(220, 40, 40),
     CrosshairSize  = 12,
     CrosshairGap   = 4,
     CrosshairThick = 2,
@@ -490,18 +490,45 @@ local function ApplyAntiAFK(v)
     end
 end
 
--- ==================== HOME TAB ====================
+-- ==================== ABA HOME ====================
 TabHome:Section({ Title = "Pro Aim — Universal" })
-TabHome:Section({ Title = "Welcome! This script works in any Roblox FPS game.", TextSize = 13, TextTransparency = 0.35 })
-TabHome:Section({ Title = "Includes full ESP, Aimbot, crosshair, fullbright, no fog, and more.", TextSize = 13, TextTransparency = 0.4 })
+TabHome:Section({ Title = "Bem-vindo! Este script funciona em qualquer jogo FPS no Roblox.", TextSize = 13, TextTransparency = 0.35 })
+TabHome:Section({ Title = "Inclui ESP completo, Aimbot, Crosshair, Fullbright, No Fog e muito mais.", TextSize = 13, TextTransparency = 0.4 })
 TabHome:Space()
-TabHome:Section({ Title = "Quick Info" })
-TabHome:Section({ Title = "Blue and white theme with simple controls.", TextSize = 14, TextTransparency = 0.35 })
+TabHome:Section({ Title = "Desenvolvedor" })
+TabHome:Section({ Title = "Script feito por  Zaxy.Hex", TextSize = 14, TextTransparency = 0.35 })
+TabHome:Button({
+    Title = "Copiar nome do criador",
+    Icon  = "copy",
+    Callback = function()
+        pcall(function() setclipboard("Zaxy.Hex") end)
+        Notify("Copiado!", "Zaxy.Hex copiado!")
+    end,
+})
 TabHome:Space()
-TabHome:Section({ Title = "Support" })
-TabHome:Section({ Title = "For updates and feature requests, check the community links in the About tab.", TextSize = 13, TextTransparency = 0.4 })
+TabHome:Section({ Title = "TikTok" })
+TabHome:Section({ Title = "@Zaxy.Hex — me segue pra pegar updates primeiro!", TextSize = 13, TextTransparency = 0.4 })
+TabHome:Button({
+    Title = "Copiar @ TikTok",
+    Icon  = "copy",
+    Callback = function()
+        pcall(function() setclipboard("@Zaxy.Hex") end)
+        Notify("Copiado!", "@Zaxy.Hex copiado!")
+    end,
+})
+TabHome:Space()
+TabHome:Section({ Title = "Discord" })
+TabHome:Section({ Title = "discord.gg/WudTSxveBc", TextSize = 13, TextTransparency = 0.35 })
+TabHome:Button({
+    Title = "Copiar link do Discord",
+    Icon  = "copy",
+    Callback = function()
+        pcall(function() setclipboard("https://discord.gg/WudTSxveBc") end)
+        Notify("Copiado!", "Link do Discord copiado!")
+    end,
+})
 
--- ==================== VISUALS TAB ====================
+-- ==================== ABA VISUALS ====================
 TabVisuals:Section({ Title = "Master" })
 TabVisuals:Toggle({
     Title    = "Enable ESP",
@@ -514,7 +541,7 @@ TabVisuals:Toggle({
     Callback = function(v) ESP_Settings.TeamCheck = v end,
 })
 TabVisuals:Space()
-TabVisuals:Section({ Title = "Elements" })
+TabVisuals:Section({ Title = "Elementos" })
 TabVisuals:Toggle({ Title="Boxes",      Default=false, Callback=function(v) ESP_Settings.Box.Enabled      = v end })
 TabVisuals:Toggle({ Title="Skeleton",   Default=false, Callback=function(v) ESP_Settings.Skeleton.Enabled = v end })
 TabVisuals:Toggle({ Title="Names",      Default=false, Callback=function(v) ESP_Settings.Name.Enabled     = v end })
@@ -523,7 +550,7 @@ TabVisuals:Toggle({ Title="Distance",   Default=false, Callback=function(v) ESP_
 TabVisuals:Toggle({ Title="Tracers",    Default=false, Callback=function(v) ESP_Settings.Tracer.Enabled   = v end })
 TabVisuals:Toggle({ Title="Box Fill",   Default=false, Callback=function(v) ESP_Settings.BoxFill.Enabled  = v end })
 TabVisuals:Space()
-TabVisuals:Section({ Title = "Settings" })
+TabVisuals:Section({ Title = "Configuracoes" })
 TabVisuals:Slider({
     Title    = "Max Distance",
     Min      = 100, Max = 5000, Default = 2000,
@@ -544,14 +571,14 @@ TabVisuals:Toggle({
     Callback = function(v) ESP_Settings.Chams.Enabled = v end,
 })
 TabVisuals:Slider({
-    Title    = "Chams Transparency",
+    Title    = "Chams Transparencia",
     Min      = 0, Max = 100, Default = 50,
     Suffix   = "%",
     Callback = function(v) ESP_Settings.Chams.FillTransparency = v / 100 end,
 })
 
--- ==================== AIMBOT TAB ====================
-TabAimbot:Section({ Title = "Control" })
+-- ==================== ABA AIMBOT ====================
+TabAimbot:Section({ Title = "Controle" })
 TabAimbot:Toggle({
     Title    = "Enable Aimbot",
     Default  = false,
@@ -578,16 +605,16 @@ TabAimbot:Toggle({
     Callback = function(v) Aimbot.Prediction = v end,
 })
 TabAimbot:Space()
-TabAimbot:Section({ Title = "Mode" })
-TabAimbot:Section({ Title = "Legit = subtle  |  Pro = faster and wider reach", TextSize = 12, TextTransparency = 0.4 })
+TabAimbot:Section({ Title = "Modo" })
+TabAimbot:Section({ Title = "Legit = sutil  |  Pro = rapido e alcance maior", TextSize = 12, TextTransparency = 0.4 })
 TabAimbot:Dropdown({
-    Title    = "Aimbot Mode",
+    Title    = "Modo do Aimbot",
     Values   = {"Legit", "Pro"},
     Default  = "Pro",
     Callback = function(v) AplicarModo(v) end,
 })
 TabAimbot:Space()
-TabAimbot:Section({ Title = "Settings" })
+TabAimbot:Section({ Title = "Configuracoes" })
 TabAimbot:Dropdown({
     Title    = "Aim Part",
     Values   = {"Head","HumanoidRootPart","UpperTorso","LowerTorso"},
@@ -603,7 +630,7 @@ TabAimbot:Slider({
 TabAimbot:Slider({
     Title    = "Smoothness",
     Value    = { Min = 1, Max = 50, Default = 0 },
-    Suffix   = " (lower = smoother)",
+    Suffix   = " (menor = mais suave)",
     Callback = function(v) Aimbot.Smoothness = v end,
 })
 TabAimbot:Slider({
@@ -620,8 +647,8 @@ TabAimbot:Toggle({
     Callback = function(v) Aimbot.FOV_Enabled = v; UpdateFOV() end,
 })
 
--- ==================== FPS TAB ====================
-TabFPS:Section({ Title = "Visuals" })
+-- ==================== ABA FPS ====================
+TabFPS:Section({ Title = "Visuais" })
 TabFPS:Toggle({
     Title    = "Fullbright",
     Default  = false,
@@ -633,7 +660,7 @@ TabFPS:Toggle({
     Callback = function(v) FPS_S.NoFog = v; ApplyNoFog(v) end,
 })
 TabFPS:Toggle({
-    Title    = "Low Graphics (more FPS)",
+    Title    = "Low Graphics (mais FPS)",
     Default  = false,
     Callback = function(v) FPS_S.LowGraphics = v; ApplyLowGraphics(v) end,
 })
@@ -662,7 +689,7 @@ TabFPS:Button({
     Icon     = "rotate-ccw",
     Callback = function()
         Camera.FieldOfView = 70
-        Notify("Camera", "FOV reset to 70")
+        Notify("Camera", "FOV resetado para 70")
     end,
 })
 TabFPS:Space()
@@ -673,7 +700,7 @@ TabFPS:Toggle({
     Callback = function(v) FPS_S.CrosshairOn = v; BuildCrosshair() end,
 })
 TabFPS:Slider({
-    Title    = "Size",
+    Title    = "Tamanho",
     Value    = { Min = 4, Max = 30, Default = 12 },
     Suffix   = "px",
     Callback = function(v) FPS_S.CrosshairSize = v; BuildCrosshair() end,
@@ -685,7 +712,7 @@ TabFPS:Slider({
     Callback = function(v) FPS_S.CrosshairGap = v; BuildCrosshair() end,
 })
 TabFPS:Slider({
-    Title    = "Thickness",
+    Title    = "Espessura",
     Value    = { Min = 1, Max = 6, Default = 2 },
     Suffix   = "px",
     Callback = function(v) FPS_S.CrosshairThick = v; BuildCrosshair() end,
@@ -796,15 +823,15 @@ LocalPlayer.CharacterAdded:Connect(function()
     if Char_S.Fly   then StartFly()       end
 end)
 
--- ==================== CHARACTER TAB ====================
-TabCharacter:Section({ Title = "Movement" })
+-- ==================== ABA CHARACTER — UI ====================
+TabCharacter:Section({ Title = "Movimento" })
 TabCharacter:Toggle({
     Title    = "Speed Hack",
     Default  = false,
     Callback = function(v) Char_S.Speed = v; ApplySpeed(v) end,
 })
 TabCharacter:Slider({
-    Title    = "Speed",
+    Title    = "Velocidade",
     Value    = { Min = 16, Max = 250, Default = 50 },
     Suffix   = " ws",
     Callback = function(v)
@@ -832,7 +859,7 @@ TabCharacter:Toggle({
     Callback = function(v) Char_S.InfJump = v end,
 })
 TabCharacter:Space()
-TabCharacter:Section({ Title = "Physics" })
+TabCharacter:Section({ Title = "Fisica" })
 TabCharacter:Toggle({
     Title    = "NoClip",
     Default  = false,
@@ -847,7 +874,7 @@ TabCharacter:Toggle({
     end,
 })
 TabCharacter:Space()
-TabCharacter:Section({ Title = "Utility" })
+TabCharacter:Section({ Title = "Util" })
 TabCharacter:Button({
     Title    = "Reset Character",
     Icon     = "refresh-cw",
@@ -857,7 +884,7 @@ TabCharacter:Button({
     end,
 })
 TabCharacter:Button({
-    Title    = "Teleport to Spawn",
+    Title    = "Teleportar pra Spawn",
     Icon     = "map-pin",
     Callback = function()
         local spawn = Workspace:FindFirstChildOfClass("SpawnLocation")
@@ -868,7 +895,7 @@ TabCharacter:Button({
     end,
 })
 
--- ==================== CONFIG ENGINE ====================
+-- ==================== ABA CONFIG — ENGINE ====================
 local CONFIG_PATH = "ProAim/config.json"
 local AUTOLOAD    = false
 
@@ -922,12 +949,12 @@ local function SalvarConfig()
         if not isfolder("ProAim") then makefolder("ProAim") end
         writefile(CONFIG_PATH, SerializarConfig())
     end)
-    if ok then Notify("Config", "Configuration saved!") else Notify("Error", "Failed to save: " .. tostring(err)) end
+    if ok then Notify("Config", "Configuração salva!") else Notify("Erro", "Falhou ao salvar: " .. tostring(err)) end
 end
 
 local function CarregarConfig()
     local ok, err = pcall(function()
-        if not isfile(CONFIG_PATH) then Notify("Config", "No saved config yet."); return end
+        if not isfile(CONFIG_PATH) then Notify("Config", "Nenhuma config salva ainda."); return end
         local data = HttpService:JSONDecode(readfile(CONFIG_PATH))
 
         if data.ESP then
@@ -970,42 +997,42 @@ local function CarregarConfig()
             if data.Character.Speed then Char_S.Speed = true; ApplySpeed(true) end
             if data.Character.Jump  then Char_S.Jump  = true; ApplyJump(true)  end
         end
-        Notify("Config", "Configuration loaded!")
+        Notify("Config", "Configuração carregada!")
     end)
-    if not ok then Notify("Error", "Failed to load: " .. tostring(err)) end
+    if not ok then Notify("Erro", "Falhou ao carregar: " .. tostring(err)) end
 end
 
--- Auto-load on startup if a saved config exists
+-- Autoload ao iniciar se tiver config salva
 task.spawn(function()
     task.wait(1)
     if AUTOLOAD then CarregarConfig() end
 end)
 
--- ==================== CONFIG TAB ====================
-TabConfig:Section({ Title = "Save / Load" })
+-- ==================== ABA CONFIG — UI ====================
+TabConfig:Section({ Title = "Salvar / Carregar" })
 TabConfig:Button({
-    Title    = "Save Config",
+    Title    = "Salvar Config",
     Icon     = "save",
     Callback = SalvarConfig,
 })
 TabConfig:Button({
-    Title    = "Load Config",
+    Title    = "Carregar Config",
     Icon     = "folder-open",
     Callback = CarregarConfig,
 })
 TabConfig:Button({
-    Title    = "Export (Clipboard)",
+    Title    = "Exportar (Clipboard)",
     Icon     = "copy",
     Callback = function()
         local json = SerializarConfig()
         pcall(function() setclipboard(json) end)
-        Notify("Config", "Config copied to clipboard!")
+        Notify("Config", "Config copiada pro clipboard!")
     end,
 })
 TabConfig:Space()
 TabConfig:Section({ Title = "Autoload" })
 TabConfig:Toggle({
-    Title    = "Auto-load config on join",
+    Title    = "Auto carregar config ao entrar",
     Default  = false,
     Callback = function(v)
         AUTOLOAD = v
@@ -1013,25 +1040,58 @@ TabConfig:Toggle({
             if not isfolder("ProAim") then makefolder("ProAim") end
             writefile("ProAim/autoload.txt", v and "true" or "false")
         end)
-        Notify("Autoload", v and "Enabled! The config will load automatically." or "Disabled.")
+        Notify("Autoload", v and "Ativado! Config será carregada automaticamente." or "Desativado.")
     end,
 })
 TabConfig:Space()
 TabConfig:Section({ Title = "Reset" })
 TabConfig:Button({
-    Title    = "Delete Saved Config",
+    Title    = "Deletar Config Salva",
     Icon     = "trash-2",
     Callback = function()
         pcall(function() delfile(CONFIG_PATH) end)
-        Notify("Config", "Config deleted.")
+        Notify("Config", "Config deletada.")
     end,
 })
-TabCredits:Section({ Title = "About" })
-TabCredits:Section({ Title = "Pro Aim Utility", TextSize = 14, TextTransparency = 0.3 })
+TabCredits:Section({ Title = "Desenvolvedor" })
+TabCredits:Section({ Title = "Script feito por Zaxy.Hex  —  Pro Aim", TextSize = 14, TextTransparency = 0.3 })
+TabCredits:Space()
+TabCredits:Section({ Title = "TikTok" })
+TabCredits:Section({ Title = "@Zaxy.Hex", TextSize = 13, TextTransparency = 0.35 })
+TabCredits:Button({
+    Title = "Copiar @ TikTok",
+    Icon  = "copy",
+    Callback = function()
+        pcall(function() setclipboard("@Zaxy.Hex") end)
+        Notify("Copiado!", "@Zaxy.Hex copiado!")
+    end,
+})
+TabCredits:Space()
+TabCredits:Section({ Title = "Discord" })
+TabCredits:Section({ Title = "discord.gg/WudTSxveBc", TextSize = 13, TextTransparency = 0.35 })
+TabCredits:Button({
+    Title = "Copiar Link do Discord",
+    Icon  = "copy",
+    Callback = function()
+        pcall(function() setclipboard("https://discord.gg/WudTSxveBc") end)
+        Notify("Copiado!", "Link do Discord copiado!")
+    end,
+})
+TabCredits:Space()
+TabCredits:Section({ Title = "Roblox" })
+TabCredits:Section({ Title = "Username: KHVVKUB", TextSize = 13, TextTransparency = 0.35 })
+TabCredits:Button({
+    Title = "Copiar Username Roblox",
+    Icon  = "copy",
+    Callback = function()
+        pcall(function() setclipboard("KHVVKUB") end)
+        Notify("Copiado!", "Username copiado!")
+    end,
+})
 TabCredits:Space()
 TabCredits:Section({ Title = "UI Library" })
-TabCredits:Section({ Title = "Custom interface built for a clean blue-white layout.", TextSize = 13, TextTransparency = 0.35 })
-TabCredits:Section({ Title = "Optimized for FPS games and utility features.", TextSize = 12, TextTransparency = 0.45 })
+TabCredits:Section({ Title = "Interface: WindUI por Footagesus", TextSize = 13, TextTransparency = 0.35 })
+TabCredits:Section({ Title = "github.com/Footagesus/WindUI", TextSize = 12, TextTransparency = 0.45 })
 
--- ==================== FINAL ====================
-Notify("Pro Aim", "Script loaded successfully.", 5)
+-- ==================== FINALIZACAO ====================
+Notify("Pro Aim", "Script carregado! by Zaxy.Hex", 5)ZZ
