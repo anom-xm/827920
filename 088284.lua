@@ -354,6 +354,13 @@ local QuickButtonSettings = {
     AimPart = { Enabled = false, Pinned = false, Position = UDim2.new(0.5, 54, 0.5, 0) },
 }
 
+local AimbotToggleControl = nil
+local AimbotQuickToggleControl = nil
+local AimbotQuickPinControl = nil
+local AimPartDropdownControl = nil
+local AimPartQuickToggleControl = nil
+local AimPartQuickPinControl = nil
+
 local QuickButtonsGui = Instance.new("ScreenGui")
 QuickButtonsGui.Name = "ProAim_QuickButtons"
 QuickButtonsGui.ResetOnSpawn = false
@@ -361,17 +368,50 @@ QuickButtonsGui.IgnoreGuiInset = true
 QuickButtonsGui.DisplayOrder = 9997
 QuickButtonsGui.Parent = CoreGui
 
+local function SyncToggleWidget(widget, value)
+    if not widget then return end
+    pcall(function()
+        if widget.SetValue then
+            widget:SetValue(value)
+        elseif widget.SetState then
+            widget:SetState(value)
+        elseif widget.Toggle then
+            widget:Toggle(value)
+        elseif widget.Value ~= nil then
+            widget.Value = value
+        elseif widget.Enabled ~= nil then
+            widget.Enabled = value
+        end
+    end)
+end
+
+local function SyncDropdownWidget(widget, value)
+    if not widget then return end
+    pcall(function()
+        if widget.SetValue then
+            widget:SetValue(value)
+        elseif widget.Select then
+            widget:Select(value)
+        elseif widget.Value ~= nil then
+            widget.Value = value
+        elseif widget.Text ~= nil then
+            widget.Text = value
+        end
+    end)
+end
+
 local function CreateQuickButton(kind, name, defaultText)
     local button = Instance.new("TextButton")
     button.Name = name
     button.Size = UDim2.fromOffset(90, 90)
+    button.AnchorPoint = Vector2.new(0.5, 0.5)
     button.BackgroundColor3 = Color3.fromRGB(55, 110, 255)
     button.BorderSizePixel = 0
     button.Text = ""
     button.AutoButtonColor = false
-    button.Active = true
-    button.Selectable = true
     button.Visible = false
+    button.Active = true
+    button.Selectable = false
     button.Parent = QuickButtonsGui
 
     local corner = Instance.new("UICorner")
@@ -412,35 +452,35 @@ local function CreateQuickButton(kind, name, defaultText)
     local dragState = {
         Dragging = false,
         StartMouse = Vector2.zero,
-        StartPos = UDim2.new(0.5, 0, 0.5, 0),
         JustDragged = false,
     }
 
     button.InputBegan:Connect(function(input)
         if input.UserInputType ~= Enum.UserInputType.MouseButton1 or button.Visible == false then return end
         if QuickButtonSettings[kind].Pinned then return end
+        if dragState.Dragging then return end
         dragState.Dragging = true
         dragState.StartMouse = input.Position
-        dragState.StartPos = button.Position
         dragState.JustDragged = false
     end)
 
     button.InputChanged:Connect(function(input)
         if input.UserInputType ~= Enum.UserInputType.MouseButton1 or not dragState.Dragging then return end
         local delta = input.Position - dragState.StartMouse
-        local newX = dragState.StartPos.X.Offset + delta.X
-        local newY = dragState.StartPos.Y.Offset + delta.Y
-        button.Position = UDim2.new(dragState.StartPos.X.Scale, newX, dragState.StartPos.Y.Scale, newY)
+        local current = button.Position
+        button.Position = UDim2.new(current.X.Scale, current.X.Offset + delta.X, current.Y.Scale, current.Y.Offset + delta.Y)
         QuickButtonSettings[kind].Position = button.Position
-        dragState.JustDragged = true
+        dragState.StartMouse = input.Position
+        if delta.Magnitude > 4 then
+            dragState.JustDragged = true
+        end
     end)
 
     button.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragState.Dragging = false
-            QuickButtonSettings[kind].Position = button.Position
             if dragState.JustDragged then
-                task.defer(function() dragState.JustDragged = false end)
+                QuickButtonSettings[kind].Position = button.Position
             end
         end
     end)
@@ -459,51 +499,14 @@ end
 local AimbotQuickButton, AimbotQuickLabel, AimbotQuickPin, AimbotQuickState = CreateQuickButton("Aimbot", "AimbotQuickButton", "AIMBOT\nOFF")
 local AimPartQuickButton, AimPartQuickLabel, AimPartQuickPin, AimPartQuickState = CreateQuickButton("AimPart", "AimPartQuickButton", "Head")
 
-local function SyncMenuToggle(toggleObject, value)
-    if not toggleObject then return end
-    local ok, err = pcall(function()
-        if toggleObject.SetValue then
-            toggleObject:SetValue(value)
-        elseif toggleObject.SetEnabled then
-            toggleObject:SetEnabled(value)
-        elseif toggleObject.Toggle then
-            toggleObject:Toggle(value)
-        elseif toggleObject.Value ~= nil then
-            toggleObject.Value = value
-        elseif toggleObject.Enabled ~= nil then
-            toggleObject.Enabled = value
-        end
-    end)
-    if not ok then
-        pcall(function() toggleObject.Value = value end)
-    end
-end
-
-local function SyncMenuDropdown(dropdownObject, value)
-    if not dropdownObject then return end
-    local ok, err = pcall(function()
-        if dropdownObject.SetValue then
-            dropdownObject:SetValue(value)
-        elseif dropdownObject.Value ~= nil then
-            dropdownObject.Value = value
-        elseif dropdownObject.Set then
-            dropdownObject:Set(value)
-        end
-    end)
-    if not ok then
-        pcall(function() dropdownObject.Value = value end)
-    end
-end
-
 local function UpdateQuickButtonState(kind)
     local state = QuickButtonSettings[kind]
     local button, label, pin, dragState = kind == "Aimbot" and AimbotQuickButton, AimbotQuickLabel, AimbotQuickPin, AimbotQuickState or AimPartQuickButton, AimPartQuickLabel, AimPartQuickPin, AimPartQuickState
 
-    button.Visible = state.Enabled
-    button.Position = state.Position
-    pin.Visible = state.Pinned
-
     if kind == "Aimbot" then
+        button.Visible = state.Enabled
+        button.Position = state.Position
+        pin.Visible = state.Pinned
         if Aimbot.Enabled then
             button.BackgroundColor3 = Color3.fromRGB(77, 182, 255)
             label.Text = "AIMBOT\nON"
@@ -512,6 +515,9 @@ local function UpdateQuickButtonState(kind)
             label.Text = "AIMBOT\nOFF"
         end
     else
+        button.Visible = state.Enabled
+        button.Position = state.Position
+        pin.Visible = state.Pinned
         label.Text = Aimbot.AimPart
         button.BackgroundColor3 = Color3.fromRGB(49, 111, 255)
     end
@@ -519,10 +525,10 @@ local function UpdateQuickButtonState(kind)
     dragState.Position = button.Position
 end
 
-local function SetAimbotEnabled(value)
-    Aimbot.Enabled = value
+local function ToggleAimbotQuickButton()
+    Aimbot.Enabled = not Aimbot.Enabled
+    SyncToggleWidget(AimbotToggleControl, Aimbot.Enabled)
     UpdateQuickButtonState("Aimbot")
-    SyncMenuToggle(AimbotMenuToggle, value)
 end
 
 local function CycleAimPartQuickButton()
@@ -534,13 +540,13 @@ local function CycleAimPartQuickButton()
             break
         end
     end
+    SyncDropdownWidget(AimPartDropdownControl, Aimbot.AimPart)
     UpdateQuickButtonState("AimPart")
-    SyncMenuDropdown(AimPartMenuDropdown, Aimbot.AimPart)
 end
 
 AimbotQuickButton.MouseButton1Click:Connect(function()
     if AimbotQuickState.JustDragged then return end
-    SetAimbotEnabled(not Aimbot.Enabled)
+    ToggleAimbotQuickButton()
 end)
 
 AimPartQuickButton.MouseButton1Click:Connect(function()
@@ -815,24 +821,16 @@ TabVisuals:Slider({
 })
 
 -- ==================== AIMBOT TAB ====================
-local AimbotMenuToggle = nil
-local AimbotShowQuickToggle = nil
-local AimbotPinQuickToggle = nil
-local AimPartMenuDropdown = nil
-local AimPartShowQuickToggle = nil
-local AimPartPinQuickToggle = nil
-
 TabAimbot:Section({ Title = "Control" })
-AimbotMenuToggle = TabAimbot:Toggle({
+AimbotToggleControl = TabAimbot:Toggle({
     Title    = "Enable Aimbot",
     Default  = false,
     Callback = function(v)
         Aimbot.Enabled = v
         UpdateQuickButtonState("Aimbot")
-        SyncMenuToggle(AimbotMenuToggle, v)
     end,
 })
-AimbotShowQuickToggle = TabAimbot:Toggle({
+AimbotQuickToggleControl = TabAimbot:Toggle({
     Title    = "Show Aimbot Quick Button",
     Default  = false,
     Callback = function(v)
@@ -840,7 +838,7 @@ AimbotShowQuickToggle = TabAimbot:Toggle({
         UpdateQuickButtonState("Aimbot")
     end,
 })
-AimbotPinQuickToggle = TabAimbot:Toggle({
+AimbotQuickPinControl = TabAimbot:Toggle({
     Title    = "Pin Aimbot Quick Button",
     Default  = false,
     Callback = function(v)
@@ -885,17 +883,16 @@ TabAimbot:Dropdown({
 })
 TabAimbot:Space()
 TabAimbot:Section({ Title = "Settings" })
-AimPartMenuDropdown = TabAimbot:Dropdown({
+AimPartDropdownControl = TabAimbot:Dropdown({
     Title    = "Aim Part",
     Values   = {"Head","HumanoidRootPart","UpperTorso","LowerTorso"},
     Default  = "Head",
     Callback = function(v)
         Aimbot.AimPart = v
         UpdateQuickButtonState("AimPart")
-        SyncMenuDropdown(AimPartMenuDropdown, v)
     end,
 })
-AimPartShowQuickToggle = TabAimbot:Toggle({
+AimPartQuickToggleControl = TabAimbot:Toggle({
     Title    = "Show Aim Part Quick Button",
     Default  = false,
     Callback = function(v)
@@ -903,7 +900,7 @@ AimPartShowQuickToggle = TabAimbot:Toggle({
         UpdateQuickButtonState("AimPart")
     end,
 })
-AimPartPinQuickToggle = TabAimbot:Toggle({
+AimPartQuickPinControl = TabAimbot:Toggle({
     Title    = "Pin Aim Part Quick Button",
     Default  = false,
     Callback = function(v)
