@@ -951,36 +951,37 @@ TabAimbot:Toggle({
 })
 
 -- ==================== FPS TAB ====================
-local FPSRoot = TabFPS:Group({})
-FPSRoot:Section({
+local FPSVisuals = TabFPS:Group({})
+FPSVisuals:Section({
     Title = "Visuals",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-FPSRoot:Toggle({
+TabFPS:Toggle({
     Title    = "Fullbright",
     Default  = false,
     Callback = function(v) FPS_S.Fullbright = v; ApplyFullbright(v) end,
 })
-FPSRoot:Toggle({
+TabFPS:Toggle({
     Title    = "No Fog",
     Default  = false,
     Callback = function(v) FPS_S.NoFog = v; ApplyNoFog(v) end,
 })
-FPSRoot:Toggle({
+TabFPS:Toggle({
     Title    = "Low Graphics (more FPS)",
     Default  = false,
     Callback = function(v) FPS_S.LowGraphics = v; ApplyLowGraphics(v) end,
 })
-FPSRoot:Space()
-FPSRoot:Section({
+TabFPS:Space()
+local FPSCamera = TabFPS:Group({})
+FPSCamera:Section({
     Title = "Camera",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-FPSRoot:Toggle({
+TabFPS:Toggle({
     Title    = "Custom FOV",
     Default  = false,
     Callback = function(v)
@@ -989,7 +990,7 @@ FPSRoot:Toggle({
         else Camera.FieldOfView = 70 end
     end,
 })
-FPSRoot:Slider({
+TabFPS:Slider({
     Title    = "FOV Value",
     Value    = { Min = 50, Max = 120, Default = 70 },
     Suffix   = "°",
@@ -998,7 +999,7 @@ FPSRoot:Slider({
         if FPS_S.CustomFOV then Camera.FieldOfView = v end
     end,
 })
-FPSRoot:Button({
+TabFPS:Button({
     Title    = "Reset Camera FOV",
     Icon     = "rotate-ccw",
     Callback = function()
@@ -1006,49 +1007,51 @@ FPSRoot:Button({
         Notify("Camera", "FOV reset to 70")
     end,
 })
-FPSRoot:Space()
-FPSRoot:Section({
+TabFPS:Space()
+local FPSCrosshair = TabFPS:Group({})
+FPSCrosshair:Section({
     Title = "Crosshair",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-FPSRoot:Toggle({
+TabFPS:Toggle({
     Title    = "Enable Crosshair",
     Default  = false,
     Callback = function(v) FPS_S.CrosshairOn = v; BuildCrosshair() end,
 })
-FPSRoot:Slider({
+TabFPS:Slider({
     Title    = "Size",
     Value    = { Min = 4, Max = 30, Default = 12 },
     Suffix   = "px",
     Callback = function(v) FPS_S.CrosshairSize = v; BuildCrosshair() end,
 })
-FPSRoot:Slider({
+TabFPS:Slider({
     Title    = "Gap",
     Value    = { Min = 0, Max = 20, Default = 4 },
     Suffix   = "px",
     Callback = function(v) FPS_S.CrosshairGap = v; BuildCrosshair() end,
 })
-FPSRoot:Slider({
+TabFPS:Slider({
     Title    = "Thickness",
     Value    = { Min = 1, Max = 6, Default = 2 },
     Suffix   = "px",
     Callback = function(v) FPS_S.CrosshairThick = v; BuildCrosshair() end,
 })
-FPSRoot:Space()
-FPSRoot:Section({
+TabFPS:Space()
+local FPSMisc = TabFPS:Group({})
+FPSMisc:Section({
     Title = "Misc",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-FPSRoot:Toggle({
+TabFPS:Toggle({
     Title    = "Anti AFK",
     Default  = false,
     Callback = function(v) FPS_S.AntiAFK = v; ApplyAntiAFK(v) end,
 })
-FPSRoot:Button({
+TabFPS:Button({
     Title    = "Rejoin",
     Icon     = "refresh-cw",
     Callback = function()
@@ -1147,19 +1150,19 @@ LocalPlayer.CharacterAdded:Connect(function()
 end)
 
 -- ==================== CHARACTER TAB ====================
-local CharacterRoot = TabCharacter:Group({})
-CharacterRoot:Section({
+local CharacterMovement = TabCharacter:Group({})
+CharacterMovement:Section({
     Title = "Movement",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-CharacterRoot:Toggle({
+TabCharacter:Toggle({
     Title    = "Speed Hack",
     Default  = false,
     Callback = function(v) Char_S.Speed = v; ApplySpeed(v) end,
 })
-CharacterRoot:Slider({
+TabCharacter:Slider({
     Title    = "Speed",
     Value    = { Min = 16, Max = 250, Default = 50 },
     Suffix   = " ws",
@@ -1168,12 +1171,12 @@ CharacterRoot:Slider({
         if Char_S.Speed then ApplySpeed(true) end
     end,
 })
-CharacterRoot:Toggle({
+TabCharacter:Toggle({
     Title    = "Jump Hack",
     Default  = false,
     Callback = function(v) Char_S.Jump = v; ApplyJump(v) end,
 })
-CharacterRoot:Slider({
+TabCharacter:Slider({
     Title    = "Jump Power",
     Value    = { Min = 50, Max = 500, Default = 100 },
     Suffix   = " jp",
@@ -1182,24 +1185,25 @@ CharacterRoot:Slider({
         if Char_S.Jump then ApplyJump(true) end
     end,
 })
-CharacterRoot:Toggle({
+TabCharacter:Toggle({
     Title    = "Infinite Jump",
     Default  = false,
     Callback = function(v) Char_S.InfJump = v end,
 })
-CharacterRoot:Space()
-CharacterRoot:Section({
+TabCharacter:Space()
+local CharacterPhysics = TabCharacter:Group({})
+CharacterPhysics:Section({
     Title = "Physics",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-CharacterRoot:Toggle({
+TabCharacter:Toggle({
     Title    = "NoClip",
     Default  = false,
     Callback = function(v) Char_S.NoClip = v end,
 })
-CharacterRoot:Toggle({
+TabCharacter:Toggle({
     Title    = "Fly",
     Default  = false,
     Callback = function(v)
@@ -1207,14 +1211,15 @@ CharacterRoot:Toggle({
         if v then StartFly() else StopFly() end
     end,
 })
-CharacterRoot:Space()
-CharacterRoot:Section({
+TabCharacter:Space()
+local CharacterUtility = TabCharacter:Group({})
+CharacterUtility:Section({
     Title = "Utility",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-CharacterRoot:Button({
+TabCharacter:Button({
     Title    = "Reset Character",
     Icon     = "refresh-cw",
     Callback = function()
@@ -1222,7 +1227,7 @@ CharacterRoot:Button({
         if hum then hum.Health = 0 end
     end,
 })
-CharacterRoot:Button({
+TabCharacter:Button({
     Title    = "Teleport to Spawn",
     Icon     = "map-pin",
     Callback = function()
@@ -1354,24 +1359,24 @@ task.spawn(function()
 end)
 
 -- ==================== CONFIG TAB ====================
-local ConfigRoot = TabConfig:Group({})
-ConfigRoot:Section({
+local ConfigSaveLoad = TabConfig:Group({})
+ConfigSaveLoad:Section({
     Title = "Save / Load",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-ConfigRoot:Button({
+TabConfig:Button({
     Title    = "Save Config",
     Icon     = "save",
     Callback = SalvarConfig,
 })
-ConfigRoot:Button({
+TabConfig:Button({
     Title    = "Load Config",
     Icon     = "folder-open",
     Callback = CarregarConfig,
 })
-ConfigRoot:Button({
+TabConfig:Button({
     Title    = "Export (Clipboard)",
     Icon     = "copy",
     Callback = function()
@@ -1380,14 +1385,15 @@ ConfigRoot:Button({
         Notify("Config", "Config copied to clipboard!")
     end,
 })
-ConfigRoot:Space()
-ConfigRoot:Section({
+TabConfig:Space()
+local ConfigAutoLoad = TabConfig:Group({})
+ConfigAutoLoad:Section({
     Title = "Autoload",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-ConfigRoot:Toggle({
+TabConfig:Toggle({
     Title    = "Auto-load config on join",
     Default  = false,
     Callback = function(v)
@@ -1399,14 +1405,15 @@ ConfigRoot:Toggle({
         Notify("Autoload", v and "Enabled! The config will load automatically." or "Disabled.")
     end,
 })
-ConfigRoot:Space()
-ConfigRoot:Section({
+TabConfig:Space()
+local ConfigReset = TabConfig:Group({})
+ConfigReset:Section({
     Title = "Reset",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-ConfigRoot:Button({
+TabConfig:Button({
     Title    = "Delete Saved Config",
     Icon     = "trash-2",
     Callback = function()
@@ -1414,23 +1421,23 @@ ConfigRoot:Button({
         Notify("Config", "Config deleted.")
     end,
 })
-
-local CreditsRoot = TabCredits:Group({})
-CreditsRoot:Section({
+local CreditsMain = TabCredits:Group({})
+CreditsMain:Section({
     Title = "About",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-CreditsRoot:Section({
+CreditsMain:Section({
     Title = "Pro Aim Utility",
     Desc = "Custom interface built for a clean blue-white layout.",
     Box = true,
     BoxBorder = true,
     Opened = true,
 })
-CreditsRoot:Space()
-CreditsRoot:Section({
+TabCredits:Space()
+local CreditsLib = TabCredits:Group({})
+CreditsLib:Section({
     Title = "UI Library",
     Desc = "Optimized for FPS games and utility features.",
     Box = true,
