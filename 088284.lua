@@ -406,7 +406,9 @@ local function GetAimPartForTarget(plr)
 
     local cache = AimbotTargetCache[plr]
     if cache and cache.Character == char and cache.Mode == Aimbot.AimPart and cache.Part and cache.Part.Parent == char then
-        return cache.Part
+        if Aimbot.AimPart ~= "Smart" and Aimbot.AimPart ~= "Custom" then
+            return cache.Part
+        end
     end
 
     local head = char:FindFirstChild("Head")
