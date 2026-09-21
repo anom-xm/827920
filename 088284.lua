@@ -108,6 +108,12 @@ local Aimbot = {
 
 local AimbotTargetCache = {}
 
+local function InvalidateAimbotTargetCache()
+    for plr in pairs(AimbotTargetCache) do
+        AimbotTargetCache[plr] = nil
+    end
+end
+
 -- Presets de modo
 local AimbotModos = {
     Legit = { Smoothness = 20, FOV = 80  },
@@ -399,7 +405,7 @@ local function GetAimPartForTarget(plr)
     end
 
     local cache = AimbotTargetCache[plr]
-    if cache and cache.Character == char and cache.Part and cache.Part.Parent == char then
+    if cache and cache.Character == char and cache.Mode == Aimbot.AimPart and cache.Part and cache.Part.Parent == char then
         return cache.Part
     end
 
@@ -454,6 +460,7 @@ local function GetAimPartForTarget(plr)
 
     AimbotTargetCache[plr] = {
         Character = char,
+        Mode = Aimbot.AimPart,
         Part = selectedPart,
     }
 
@@ -877,6 +884,7 @@ TabAimbot:Dropdown({
     Default  = "Head",
     Callback = function(v)
         Aimbot.AimPart = v
+        InvalidateAimbotTargetCache()
         RefreshAimBiasVisibility()
     end,
 })
