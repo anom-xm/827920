@@ -820,22 +820,6 @@ AimbotSettings:Section({
 local AimbotExceptionDropdown = nil
 local AimbotBiasSlider = nil
 
-local function SetVisibleIfPossible(element, visible)
-    if not element then return end
-    if typeof(element) == "Instance" then
-        element.Visible = visible
-        return
-    end
-
-    if type(element) == "table" then
-        if element.Visible ~= nil then element.Visible = visible end
-        if element.Main and element.Main.Visible ~= nil then element.Main.Visible = visible end
-        if element.Frame and element.Frame.Visible ~= nil then element.Frame.Visible = visible end
-        if element.Container and element.Container.Visible ~= nil then element.Container.Visible = visible end
-        if element.UI and element.UI.Visible ~= nil then element.UI.Visible = visible end
-    end
-end
-
 local function RefreshExceptionDropdown()
     if not AimbotExceptionDropdown then return end
     local values = GetAimbotExceptionNames()
@@ -860,8 +844,26 @@ local function RefreshExceptionDropdown()
 end
 
 local function RefreshAimBiasVisibility()
-    if not AimbotBiasSlider then return end
-    SetVisibleIfPossible(AimbotBiasSlider, Aimbot.AimPart == "Custom")
+    if Aimbot.AimPart == "Custom" then
+        if not AimbotBiasSlider then
+            AimbotBiasSlider = TabAimbot:Slider({
+                Title    = "Aim Bias: Head / Body",
+                Value    = { Min = -100, Max = 100, Default = 0 },
+                Suffix   = "Head ←→ Body",
+                Callback = function(v) Aimbot.AimBias = v end,
+            })
+        end
+        return
+    end
+
+    if AimbotBiasSlider then
+        if AimbotBiasSlider.Destroy then
+            AimbotBiasSlider:Destroy()
+        elseif AimbotBiasSlider.Parent then
+            AimbotBiasSlider.Parent = nil
+        end
+        AimbotBiasSlider = nil
+    end
 end
 
 TabAimbot:Dropdown({
@@ -872,12 +874,6 @@ TabAimbot:Dropdown({
         Aimbot.AimPart = v
         RefreshAimBiasVisibility()
     end,
-})
-AimbotBiasSlider = TabAimbot:Slider({
-    Title    = "Aim Bias: Head / Body",
-    Value    = { Min = -100, Max = 100, Default = 0 },
-    Suffix   = "Head ←→ Body",
-    Callback = function(v) Aimbot.AimBias = v end,
 })
 RefreshAimBiasVisibility()
 TabAimbot:Slider({
