@@ -93,11 +93,12 @@ local Aimbot = {
     VisibleCheck     = false,
     ForceFieldCheck  = false,
     AimPart          = "Head",
+    AimBias          = 0,
     FOV              = 138,
     FOV_Enabled      = false,
     FOV_Color        = Color3.fromRGB(94, 175, 255),
     FOV_LockedColor  = Color3.fromRGB(160, 230, 255),
-    Smoothness       = 31,
+    Smoothness       = 1,
     Prediction       = false,
     PredictionAmount = 0.14,
     Exceptions      = {},
@@ -367,6 +368,60 @@ local function GetAimbotExceptionNames()
     return names
 end
 
+local function GetRandomBodyPart(char)
+    local parts = {
+        char:FindFirstChild("HumanoidRootPart"),
+        char:FindFirstChild("UpperTorso"),
+        char:FindFirstChild("LowerTorso"),
+        char:FindFirstChild("Head"),
+    }
+    local list = {}
+    for _, part in ipairs(parts) do
+        if part then table.insert(list, part) end
+    end
+    if #list == 0 then return nil end
+    return list[math.random(1, #list)]
+end
+
+local function GetAimPartForTarget(plr)
+    if not plr or not plr.Character then return nil end
+    local char = plr.Character
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum or hum.Health <= 0 then return nil end
+
+    local head = char:FindFirstChild("Head")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local upper = char:FindFirstChild("UpperTorso")
+    local lower = char:FindFirstChild("LowerTorso")
+    local bodyParts = {root, upper, lower}
+
+    if Aimbot.AimPart == "Random" then
+        return GetRandomBodyPart(char)
+    end
+
+    if Aimbot.AimPart == "Smart" then
+        local distance = root and (root.Position - Camera.CFrame.Position).Magnitude or 0
+        local headChance = math.clamp(1 - (distance / 300), 0.05, 0.95)
+        if head and math.random() < headChance then return head end
+        for _, part in ipairs(bodyParts) do
+            if part then return part end
+        end
+        return head or root
+    end
+
+    if Aimbot.AimPart == "Custom" then
+        local bias = Aimbot.AimBias or 0
+        local headChance = math.clamp(0.5 - (bias / 200), 0.05, 0.95)
+        if head and math.random() < headChance then return head end
+        local bodyChoice = bodyParts[math.random(1, #bodyParts)]
+        return bodyChoice or head or root
+    end
+
+    local targetPart = char:FindFirstChild(Aimbot.AimPart)
+    if targetPart then return targetPart end
+    return head or root or upper or lower
+end
+
 local function IsExceptionPlayer(plr)
     if not plr then return false end
     for _, name in ipairs(Aimbot.Exceptions) do
@@ -414,17 +469,26 @@ local function RemoveException(name)
     return false
 end
 
+Players.PlayerAdded:Connect(function()
+    if AimbotExceptionDropdown then RefreshExceptionDropdown() end
+end)
+
+Players.PlayerRemoving:Connect(function()
+    if AimbotExceptionDropdown then RefreshExceptionDropdown() end
+end)
+
 local function GetTarget()
     local closest = nil
     local bestDist = Aimbot.FOV
 
     for _, plr in Players:GetPlayers() do
-        if plr == LocalPlayer or not plr.Character or plr.Character:FindFirstChild("Humanoid").Health <= 0 then continue end
+        local hum = plr.Character and plr.Character:FindFirstChildOfClass("Humanoid")
+        if plr == LocalPlayer or not plr.Character or not hum or hum.Health <= 0 then continue end
         if Aimbot.TeamCheck and plr.Team == LocalPlayer.Team then continue end
         if IsExceptionPlayer(plr) then continue end
         if Aimbot.ForceFieldCheck and IsForceFieldProtected(plr) then continue end
 
-        local part = plr.Character:FindFirstChild(Aimbot.AimPart) or plr.Character:FindFirstChild("HumanoidRootPart")
+        local part = GetAimPartForTarget(plr)
         if not part then continue end
 
         local pos = part.Position
@@ -726,11 +790,41 @@ AimbotSettings:Section({
     BoxBorder = true,
     Opened = true,
 })
+local AimbotExceptionDropdown = nil
+local function RefreshExceptionDropdown()
+    if not AimbotExceptionDropdown then return end
+    local values = GetAimbotExceptionNames()
+    AimbotExceptionDropdown.Values = values
+    if AimbotExceptionDropdown.SetValues then
+        AimbotExceptionDropdown:SetValues(values)
+    end
+    if table.find(values, Aimbot.ExceptionTarget) then
+        if AimbotExceptionDropdown.SetValue then
+            AimbotExceptionDropdown:SetValue(Aimbot.ExceptionTarget)
+        else
+            AimbotExceptionDropdown.Value = Aimbot.ExceptionTarget
+        end
+    else
+        Aimbot.ExceptionTarget = "None"
+        if AimbotExceptionDropdown.SetValue then
+            AimbotExceptionDropdown:SetValue("None")
+        else
+            AimbotExceptionDropdown.Value = "None"
+        end
+    end
+end
+
 TabAimbot:Dropdown({
     Title    = "Aim Part",
-    Values   = {"Head","HumanoidRootPart","UpperTorso","LowerTorso"},
+    Values   = {"Head","HumanoidRootPart","UpperTorso","LowerTorso","Random","Smart","Custom"},
     Default  = "Head",
     Callback = function(v) Aimbot.AimPart = v end,
+})
+TabAimbot:Slider({
+    Title    = "Aim Bias",
+    Value    = { Min = -100, Max = 100, Default = 0 },
+    Suffix   = " head <-> body",
+    Callback = function(v) Aimbot.AimBias = v end,
 })
 TabAimbot:Slider({
     Title    = "FOV Size",
@@ -740,7 +834,7 @@ TabAimbot:Slider({
 })
 TabAimbot:Slider({
     Title    = "Smoothness",
-    Value    = { Min = 1, Max = 50, Default = 0 },
+    Value    = { Min = 1, Max = 50, Default = 1 },
     Suffix   = " (lower = smoother)",
     Callback = function(v) Aimbot.Smoothness = v end,
 })
@@ -758,7 +852,7 @@ AimbotExceptionGroup:Section({
     BoxBorder = true,
     Opened = true,
 })
-TabAimbot:Dropdown({
+AimbotExceptionDropdown = TabAimbot:Dropdown({
     Title    = "Select Player",
     Values   = GetAimbotExceptionNames(),
     Default  = "None",
@@ -769,6 +863,7 @@ TabAimbot:Button({
     Icon     = "plus",
     Callback = function()
         if AddException(Aimbot.ExceptionTarget) then
+            RefreshExceptionDropdown()
             Notify("Aimbot", Aimbot.ExceptionTarget .. " will be ignored.")
         else
             Notify("Aimbot", Aimbot.ExceptionTarget == "None" and "Select a player first." or "Player already ignored.")
@@ -780,6 +875,7 @@ TabAimbot:Button({
     Icon     = "minus",
     Callback = function()
         if RemoveException(Aimbot.ExceptionTarget) then
+            RefreshExceptionDropdown()
             Notify("Aimbot", Aimbot.ExceptionTarget .. " removed from exceptions.")
         else
             Notify("Aimbot", Aimbot.ExceptionTarget == "None" and "Select a player first." or "Player not in exceptions.")
@@ -1115,6 +1211,7 @@ local function SerializarConfig()
             ForceFieldCheck  = Aimbot.ForceFieldCheck,
             Prediction       = Aimbot.Prediction,
             AimPart          = Aimbot.AimPart,
+            AimBias          = Aimbot.AimBias,
             FOV              = Aimbot.FOV,
             Smoothness       = Aimbot.Smoothness,
             FOV_Enabled      = Aimbot.FOV_Enabled,
@@ -1173,6 +1270,7 @@ local function CarregarConfig()
             Aimbot.ForceFieldCheck = data.Aimbot.ForceFieldCheck or false
             Aimbot.Prediction      = data.Aimbot.Prediction      or false
             Aimbot.AimPart         = data.Aimbot.AimPart         or "Head"
+            Aimbot.AimBias         = data.Aimbot.AimBias         or 0
             Aimbot.FOV             = data.Aimbot.FOV             or 160
             Aimbot.Smoothness      = data.Aimbot.Smoothness      or 10
             Aimbot.FOV_Enabled     = data.Aimbot.FOV_Enabled     or false
