@@ -106,6 +106,8 @@ local Aimbot = {
     Modo             = "Pro",  -- "Legit", "Pro"
 }
 
+local AimbotTargetCache = {}
+
 -- Presets de modo
 local AimbotModos = {
     Legit = { Smoothness = 20, FOV = 80  },
@@ -384,10 +386,22 @@ local function GetRandomBodyPart(char)
 end
 
 local function GetAimPartForTarget(plr)
-    if not plr or not plr.Character then return nil end
+    if not plr or not plr.Character then
+        AimbotTargetCache[plr] = nil
+        return nil
+    end
+
     local char = plr.Character
     local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum or hum.Health <= 0 then return nil end
+    if not hum or hum.Health <= 0 then
+        AimbotTargetCache[plr] = nil
+        return nil
+    end
+
+    local cache = AimbotTargetCache[plr]
+    if cache and cache.Character == char and cache.Part and cache.Part.Parent == char then
+        return cache.Part
+    end
 
     local head = char:FindFirstChild("Head")
     local root = char:FindFirstChild("HumanoidRootPart")
@@ -395,31 +409,43 @@ local function GetAimPartForTarget(plr)
     local lower = char:FindFirstChild("LowerTorso")
     local bodyParts = {root, upper, lower}
 
-    if Aimbot.AimPart == "Random" then
-        return GetRandomBodyPart(char)
-    end
+    local selectedPart
 
-    if Aimbot.AimPart == "Smart" then
+    if Aimbot.AimPart == "Random" then
+        selectedPart = GetRandomBodyPart(char)
+    elseif Aimbot.AimPart == "Smart" then
         local distance = root and (root.Position - Camera.CFrame.Position).Magnitude or 0
         local headChance = math.clamp(1 - (distance / 300), 0.05, 0.95)
-        if head and math.random() < headChance then return head end
-        for _, part in ipairs(bodyParts) do
-            if part then return part end
+        if head and math.random() < headChance then
+            selectedPart = head
+        else
+            for _, part in ipairs(bodyParts) do
+                if part then
+                    selectedPart = part
+                    break
+                end
+            end
+            if not selectedPart then selectedPart = head or root end
         end
-        return head or root
-    end
-
-    if Aimbot.AimPart == "Custom" then
+    elseif Aimbot.AimPart == "Custom" then
         local bias = Aimbot.AimBias or 0
         local headChance = math.clamp(0.5 - (bias / 200), 0.05, 0.95)
-        if head and math.random() < headChance then return head end
-        local bodyChoice = bodyParts[math.random(1, #bodyParts)]
-        return bodyChoice or head or root
+        if head and math.random() < headChance then
+            selectedPart = head
+        else
+            local bodyChoice = bodyParts[math.random(1, #bodyParts)]
+            selectedPart = bodyChoice or head or root
+        end
+    else
+        selectedPart = char:FindFirstChild(Aimbot.AimPart) or head or root or upper or lower
     end
 
-    local targetPart = char:FindFirstChild(Aimbot.AimPart)
-    if targetPart then return targetPart end
-    return head or root or upper or lower
+    AimbotTargetCache[plr] = {
+        Character = char,
+        Part = selectedPart,
+    }
+
+    return selectedPart
 end
 
 local function IsExceptionPlayer(plr)
@@ -473,7 +499,8 @@ Players.PlayerAdded:Connect(function()
     if AimbotExceptionDropdown then RefreshExceptionDropdown() end
 end)
 
-Players.PlayerRemoving:Connect(function()
+Players.PlayerRemoving:Connect(function(player)
+    AimbotTargetCache[player] = nil
     if AimbotExceptionDropdown then RefreshExceptionDropdown() end
 end)
 
