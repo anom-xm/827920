@@ -832,26 +832,6 @@ AimbotSettings:Section({
 local AimbotExceptionDropdown = nil
 local AimbotBiasSlider = nil
 
-local function SetVisibleRecursively(obj, visible)
-    if not obj then return end
-    if typeof(obj) == "Instance" then
-        if obj.Visible ~= nil then obj.Visible = visible end
-        for _, child in ipairs(obj:GetDescendants()) do
-            if child.Visible ~= nil then child.Visible = visible end
-        end
-        return
-    end
-
-    if type(obj) == "table" then
-        if obj.Visible ~= nil then obj.Visible = visible end
-        for _, value in pairs(obj) do
-            if type(value) == "table" or typeof(value) == "Instance" then
-                SetVisibleRecursively(value, visible)
-            end
-        end
-    end
-end
-
 local function RefreshExceptionDropdown()
     if not AimbotExceptionDropdown then return end
     local values = GetAimbotExceptionNames()
@@ -877,7 +857,11 @@ end
 
 local function RefreshAimBiasVisibility()
     if not AimbotBiasSlider then return end
-    SetVisibleRecursively(AimbotBiasSlider, Aimbot.AimPart == "Custom")
+    if AimbotBiasSlider.Visible ~= nil then
+        AimbotBiasSlider.Visible = Aimbot.AimPart == "Custom"
+    elseif AimbotBiasSlider.Main and AimbotBiasSlider.Main.Visible ~= nil then
+        AimbotBiasSlider.Main.Visible = Aimbot.AimPart == "Custom"
+    end
 end
 
 TabAimbot:Dropdown({
