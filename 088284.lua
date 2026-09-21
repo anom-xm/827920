@@ -404,18 +404,27 @@ local function GetAimPartForTarget(plr)
         return nil
     end
 
-    local cache = AimbotTargetCache[plr]
-    if cache and cache.Character == char and cache.Mode == Aimbot.AimPart and cache.Part and cache.Part.Parent == char then
-        if Aimbot.AimPart ~= "Smart" and Aimbot.AimPart ~= "Custom" then
-            return cache.Part
-        end
-    end
-
     local head = char:FindFirstChild("Head")
     local root = char:FindFirstChild("HumanoidRootPart")
     local upper = char:FindFirstChild("UpperTorso")
     local lower = char:FindFirstChild("LowerTorso")
     local bodyParts = {root, upper, lower}
+    local currentDistance = root and (root.Position - Camera.CFrame.Position).Magnitude or 0
+
+    local cache = AimbotTargetCache[plr]
+    if cache and cache.Character == char and cache.Mode == Aimbot.AimPart and cache.Part and cache.Part.Parent == char then
+        if Aimbot.AimPart ~= "Smart" and Aimbot.AimPart ~= "Custom" then
+            return cache.Part
+        elseif Aimbot.AimPart == "Smart" then
+            if math.abs((cache.Distance or currentDistance) - currentDistance) <= 1 then
+                return cache.Part
+            end
+        elseif Aimbot.AimPart == "Custom" then
+            if (cache.Bias or 0) == (Aimbot.AimBias or 0) then
+                return cache.Part
+            end
+        end
+    end
 
     local selectedPart
 
@@ -464,6 +473,8 @@ local function GetAimPartForTarget(plr)
         Character = char,
         Mode = Aimbot.AimPart,
         Part = selectedPart,
+        Distance = currentDistance,
+        Bias = Aimbot.AimBias or 0,
     }
 
     return selectedPart
@@ -845,9 +856,11 @@ local function RefreshExceptionDropdown()
     if not AimbotExceptionDropdown then return end
     local values = GetAimbotExceptionNames()
     AimbotExceptionDropdown.Values = values
+
     if AimbotExceptionDropdown.SetValues then
         AimbotExceptionDropdown:SetValues(values)
     end
+
     if table.find(values, Aimbot.ExceptionTarget) then
         if AimbotExceptionDropdown.SetValue then
             AimbotExceptionDropdown:SetValue(Aimbot.ExceptionTarget)
@@ -860,6 +873,20 @@ local function RefreshExceptionDropdown()
             AimbotExceptionDropdown:SetValue("None")
         else
             AimbotExceptionDropdown.Value = "None"
+        end
+    end
+end
+
+local function HookExceptionDropdownRefresh()
+    if not AimbotExceptionDropdown then return end
+    local methods = {"Open", "Toggle", "Expand", "Show"}
+    for _, name in ipairs(methods) do
+        local fn = AimbotExceptionDropdown[name]
+        if type(fn) == "function" then
+            AimbotExceptionDropdown[name] = function(...)
+                RefreshExceptionDropdown()
+                return fn(...)
+            end
         end
     end
 end
@@ -929,6 +956,8 @@ AimbotExceptionDropdown = TabAimbot:Dropdown({
     Default  = "None",
     Callback = function(v) Aimbot.ExceptionTarget = v end,
 })
+HookExceptionDropdownRefresh()
+RefreshExceptionDropdown()
 TabAimbot:Button({
     Title    = "Add Exception",
     Icon     = "plus",
