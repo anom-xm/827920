@@ -857,10 +857,17 @@ end
 
 local function RefreshAimBiasVisibility()
     if not AimbotBiasSlider then return end
+    local visible = Aimbot.AimPart == "Custom"
+    local target = AimbotBiasSlider.UIElements and AimbotBiasSlider.UIElements.Main
+        or AimbotBiasSlider.Main
+        or AimbotBiasSlider.ElementFrame
+        or AimbotBiasSlider
+
+    if target and target.Visible ~= nil then
+        target.Visible = visible
+    end
     if AimbotBiasSlider.Visible ~= nil then
-        AimbotBiasSlider.Visible = Aimbot.AimPart == "Custom"
-    elseif AimbotBiasSlider.Main and AimbotBiasSlider.Main.Visible ~= nil then
-        AimbotBiasSlider.Main.Visible = Aimbot.AimPart == "Custom"
+        AimbotBiasSlider.Visible = visible
     end
 end
 
