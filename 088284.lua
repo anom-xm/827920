@@ -415,17 +415,29 @@ local function GetAimPartForTarget(plr)
         selectedPart = GetRandomBodyPart(char)
     elseif Aimbot.AimPart == "Smart" then
         local distance = root and (root.Position - Camera.CFrame.Position).Magnitude or 0
-        local headChance = math.clamp(1 - (distance / 300), 0.05, 0.95)
-        if head and math.random() < headChance then
-            selectedPart = head
+        local minDistance = 7
+        local maxDistance = 125
+        local minChance = 0.01
+        local maxChance = 1
+
+        if distance <= minDistance then
+            selectedPart = head or root or bodyParts[1] or upper or lower
         else
-            for _, part in ipairs(bodyParts) do
-                if part then
-                    selectedPart = part
-                    break
+            local clampedDistance = math.clamp(distance, minDistance, maxDistance)
+            local t = (clampedDistance - minDistance) / (maxDistance - minDistance)
+            local headChance = maxChance - (maxChance - minChance) * t
+
+            if head and math.random() < headChance then
+                selectedPart = head
+            else
+                for _, part in ipairs(bodyParts) do
+                    if part then
+                        selectedPart = part
+                        break
+                    end
                 end
+                if not selectedPart then selectedPart = head or root end
             end
-            if not selectedPart then selectedPart = head or root end
         end
     elseif Aimbot.AimPart == "Custom" then
         local bias = Aimbot.AimBias or 0
@@ -820,6 +832,26 @@ AimbotSettings:Section({
 local AimbotExceptionDropdown = nil
 local AimbotBiasSlider = nil
 
+local function SetVisibleRecursively(obj, visible)
+    if not obj then return end
+    if typeof(obj) == "Instance" then
+        if obj.Visible ~= nil then obj.Visible = visible end
+        for _, child in ipairs(obj:GetDescendants()) do
+            if child.Visible ~= nil then child.Visible = visible end
+        end
+        return
+    end
+
+    if type(obj) == "table" then
+        if obj.Visible ~= nil then obj.Visible = visible end
+        for _, value in pairs(obj) do
+            if type(value) == "table" or typeof(value) == "Instance" then
+                SetVisibleRecursively(value, visible)
+            end
+        end
+    end
+end
+
 local function RefreshExceptionDropdown()
     if not AimbotExceptionDropdown then return end
     local values = GetAimbotExceptionNames()
@@ -844,26 +876,8 @@ local function RefreshExceptionDropdown()
 end
 
 local function RefreshAimBiasVisibility()
-    if Aimbot.AimPart == "Custom" then
-        if not AimbotBiasSlider then
-            AimbotBiasSlider = TabAimbot:Slider({
-                Title    = "Aim Bias: Head / Body",
-                Value    = { Min = -100, Max = 100, Default = 0 },
-                Suffix   = "Head ←→ Body",
-                Callback = function(v) Aimbot.AimBias = v end,
-            })
-        end
-        return
-    end
-
-    if AimbotBiasSlider then
-        if AimbotBiasSlider.Destroy then
-            AimbotBiasSlider:Destroy()
-        elseif AimbotBiasSlider.Parent then
-            AimbotBiasSlider.Parent = nil
-        end
-        AimbotBiasSlider = nil
-    end
+    if not AimbotBiasSlider then return end
+    SetVisibleRecursively(AimbotBiasSlider, Aimbot.AimPart == "Custom")
 end
 
 TabAimbot:Dropdown({
@@ -874,6 +888,12 @@ TabAimbot:Dropdown({
         Aimbot.AimPart = v
         RefreshAimBiasVisibility()
     end,
+})
+AimbotBiasSlider = TabAimbot:Slider({
+    Title    = "Aim Bias: Head / Body",
+    Value    = { Min = -100, Max = 100, Default = 0 },
+    Suffix   = "Head ←→ Body",
+    Callback = function(v) Aimbot.AimBias = v end,
 })
 RefreshAimBiasVisibility()
 TabAimbot:Slider({
