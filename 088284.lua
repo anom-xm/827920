@@ -15,16 +15,16 @@ local WindUI = loadstring(game:HttpGet(
 ))()
 
 WindUI:AddTheme({
-    Name        = "BlueWhite",
-    Accent      = Color3.fromHex("#4aa3ff"),
-    Background  = Color3.fromHex("#081827"),
-    Outline     = Color3.fromHex("#9ed7ff"),
-    Text        = Color3.fromHex("#f5fbff"),
-    Placeholder = Color3.fromHex("#b7d9ff"),
-    Button      = Color3.fromHex("#1d6fe8"),
-    Icon        = Color3.fromHex("#d9f4ff"),
+    Name        = "PurpleGlow",
+    Accent      = Color3.fromHex("#a06bff"),
+    Background  = Color3.fromHex("#110d1b"),
+    Outline     = Color3.fromHex("#d7c2ff"),
+    Text        = Color3.fromHex("#f6f1ff"),
+    Placeholder = Color3.fromHex("#cdb7ff"),
+    Button      = Color3.fromHex("#7d4cff"),
+    Icon        = Color3.fromHex("#f0eaff"),
 })
-WindUI:SetTheme("BlueWhite")
+WindUI:SetTheme("PurpleGlow")
 
 local Window = WindUI:CreateWindow({
     Title               = "Pro Aim",
@@ -32,8 +32,8 @@ local Window = WindUI:CreateWindow({
     Folder              = "ProAim",
     HidePanelBackground = false,
     Background          = WindUI:Gradient({
-        ["0"]   = { Color = Color3.fromHex("#091c2d"), Transparency = 0.10 },
-        ["100"] = { Color = Color3.fromHex("#123d69"), Transparency = 0.30 },
+        ["0"]   = { Color = Color3.fromHex("#1a1228"), Transparency = 0.10 },
+        ["100"] = { Color = Color3.fromHex("#3d2a5f"), Transparency = 0.30 },
     }, { Rotation = 135 }),
     User = {
         Enabled   = true,
@@ -70,16 +70,16 @@ local ESP_Settings = {
     TeamCheck     = false,
     TextSize      = 13,
     Font          = 2,
-    Box           = { Enabled = false, Color = Color3.fromRGB(94, 175, 255), Outline = true },
-    BoxFill       = { Enabled = false, Color = Color3.fromRGB(120, 200, 255), Transparency = 0.7 },
+    Box           = { Enabled = false, Color = Color3.fromRGB(177, 143, 255), Outline = true },
+    BoxFill       = { Enabled = false, Color = Color3.fromRGB(203, 179, 255), Transparency = 0.7 },
     Name          = { Enabled = false, Color = Color3.fromRGB(255, 255, 255) },
-    Distance      = { Enabled = false, Color = Color3.fromRGB(210, 232, 255) },
+    Distance      = { Enabled = false, Color = Color3.fromRGB(236, 227, 255) },
     HealthBar     = { Enabled = false },
-    Tracer        = { Enabled = false, Origin = "Bottom", Color = Color3.fromRGB(94, 175, 255) },
-    Skeleton      = { Enabled = false, Color = Color3.fromRGB(94, 175, 255), Thickness = 1 },
+    Tracer        = { Enabled = false, Origin = "Bottom", Color = Color3.fromRGB(177, 143, 255) },
+    Skeleton      = { Enabled = false, Color = Color3.fromRGB(177, 143, 255), Thickness = 1 },
     Chams         = {
         Enabled             = false,
-        FillColor           = Color3.fromRGB(90, 160, 255),
+        FillColor           = Color3.fromRGB(158, 118, 255),
         OutlineColor        = Color3.fromRGB(255, 255, 255),
         FillTransparency    = 0.5,
         OutlineTransparency = 0,
@@ -96,8 +96,8 @@ local Aimbot = {
     AimBias          = 0,
     FOV              = 138,
     FOV_Enabled      = false,
-    FOV_Color        = Color3.fromRGB(94, 175, 255),
-    FOV_LockedColor  = Color3.fromRGB(160, 230, 255),
+    FOV_Color        = Color3.fromRGB(169, 128, 255),
+    FOV_LockedColor  = Color3.fromRGB(221, 206, 255),
     Smoothness       = 1,
     Prediction       = false,
     PredictionAmount = 0.14,
@@ -120,7 +120,7 @@ local FPS_S = {
     FOVValue       = 70,
     AntiAFK        = false,
     CrosshairOn    = false,
-    CrosshairColor = Color3.fromRGB(120, 210, 255),
+    CrosshairColor = Color3.fromRGB(177, 143, 255),
     CrosshairSize  = 12,
     CrosshairGap   = 4,
     CrosshairThick = 2,
@@ -791,6 +791,24 @@ AimbotSettings:Section({
     Opened = true,
 })
 local AimbotExceptionDropdown = nil
+local AimbotBiasSlider = nil
+
+local function SetVisibleIfPossible(element, visible)
+    if not element then return end
+    if typeof(element) == "Instance" then
+        element.Visible = visible
+        return
+    end
+
+    if type(element) == "table" then
+        if element.Visible ~= nil then element.Visible = visible end
+        if element.Main and element.Main.Visible ~= nil then element.Main.Visible = visible end
+        if element.Frame and element.Frame.Visible ~= nil then element.Frame.Visible = visible end
+        if element.Container and element.Container.Visible ~= nil then element.Container.Visible = visible end
+        if element.UI and element.UI.Visible ~= nil then element.UI.Visible = visible end
+    end
+end
+
 local function RefreshExceptionDropdown()
     if not AimbotExceptionDropdown then return end
     local values = GetAimbotExceptionNames()
@@ -814,18 +832,27 @@ local function RefreshExceptionDropdown()
     end
 end
 
+local function RefreshAimBiasVisibility()
+    if not AimbotBiasSlider then return end
+    SetVisibleIfPossible(AimbotBiasSlider, Aimbot.AimPart == "Custom")
+end
+
 TabAimbot:Dropdown({
     Title    = "Aim Part",
     Values   = {"Head","HumanoidRootPart","UpperTorso","LowerTorso","Random","Smart","Custom"},
     Default  = "Head",
-    Callback = function(v) Aimbot.AimPart = v end,
+    Callback = function(v)
+        Aimbot.AimPart = v
+        RefreshAimBiasVisibility()
+    end,
 })
-TabAimbot:Slider({
-    Title    = "Aim Bias",
+AimbotBiasSlider = TabAimbot:Slider({
+    Title    = "Aim Bias: Head / Body",
     Value    = { Min = -100, Max = 100, Default = 0 },
-    Suffix   = " head <-> body",
+    Suffix   = "Head ←→ Body",
     Callback = function(v) Aimbot.AimBias = v end,
 })
+RefreshAimBiasVisibility()
 TabAimbot:Slider({
     Title    = "FOV Size",
     Value    = { Min = 10, Max = 600, Default = 138 },
