@@ -879,21 +879,11 @@ end
 
 local function HookExceptionDropdownRefresh()
     if not AimbotExceptionDropdown then return end
-
-    local open = AimbotExceptionDropdown.Open
-    if type(open) == "function" then
-        AimbotExceptionDropdown.Open = function(...)
+    local dropdownButton = AimbotExceptionDropdown.UIElements and AimbotExceptionDropdown.UIElements.Dropdown
+    if dropdownButton and dropdownButton.MouseButton1Click then
+        dropdownButton.MouseButton1Click:Connect(function()
             RefreshExceptionDropdown()
-            return open(...)
-        end
-    end
-
-    local refresh = AimbotExceptionDropdown.Refresh
-    if type(refresh) == "function" then
-        AimbotExceptionDropdown.Refresh = function(...)
-            RefreshExceptionDropdown()
-            return refresh(...)
-        end
+        end)
     end
 end
 
