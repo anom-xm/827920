@@ -854,36 +854,45 @@ local AimbotBiasSlider = nil
 
 local function RefreshExceptionDropdown()
     if not AimbotExceptionDropdown then return end
-    local values = GetAimbotExceptionNames()
-    AimbotExceptionDropdown.Values = values
 
-    if AimbotExceptionDropdown.SetValues then
-        AimbotExceptionDropdown:SetValues(values)
+    local values = GetAimbotExceptionNames()
+    if AimbotExceptionDropdown.Refresh then
+        AimbotExceptionDropdown:Refresh(values)
+    else
+        AimbotExceptionDropdown.Values = values
+        if AimbotExceptionDropdown.SetValues then
+            AimbotExceptionDropdown:SetValues(values)
+        end
     end
 
-    if table.find(values, Aimbot.ExceptionTarget) then
-        if AimbotExceptionDropdown.SetValue then
-            AimbotExceptionDropdown:SetValue(Aimbot.ExceptionTarget)
-        else
-            AimbotExceptionDropdown.Value = Aimbot.ExceptionTarget
-        end
+    local selected = table.find(values, Aimbot.ExceptionTarget) and Aimbot.ExceptionTarget or "None"
+    Aimbot.ExceptionTarget = selected
+
+    if AimbotExceptionDropdown.Select then
+        AimbotExceptionDropdown:Select(selected)
+    elseif AimbotExceptionDropdown.SetValue then
+        AimbotExceptionDropdown:SetValue(selected)
     else
-        Aimbot.ExceptionTarget = "None"
-        if AimbotExceptionDropdown.SetValue then
-            AimbotExceptionDropdown:SetValue("None")
-        else
-            AimbotExceptionDropdown.Value = "None"
-        end
+        AimbotExceptionDropdown.Value = selected
     end
 end
 
 local function HookExceptionDropdownRefresh()
     if not AimbotExceptionDropdown then return end
-    local dropdownButton = AimbotExceptionDropdown.UIElements and AimbotExceptionDropdown.UIElements.Dropdown
-    if dropdownButton and dropdownButton.MouseButton1Click then
-        dropdownButton.MouseButton1Click:Connect(function()
+
+    local button = AimbotExceptionDropdown.UIElements and AimbotExceptionDropdown.UIElements.Dropdown
+    if button and button.MouseButton1Click then
+        button.MouseButton1Click:Connect(function()
             RefreshExceptionDropdown()
         end)
+    end
+
+    if AimbotExceptionDropdown.Open then
+        local originalOpen = AimbotExceptionDropdown.Open
+        AimbotExceptionDropdown.Open = function(...)
+            RefreshExceptionDropdown()
+            return originalOpen(...)
+        end
     end
 end
 
