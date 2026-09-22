@@ -879,14 +879,20 @@ end
 
 local function HookExceptionDropdownRefresh()
     if not AimbotExceptionDropdown then return end
-    local methods = {"Open", "Toggle", "Expand", "Show"}
-    for _, name in ipairs(methods) do
-        local fn = AimbotExceptionDropdown[name]
-        if type(fn) == "function" then
-            AimbotExceptionDropdown[name] = function(...)
-                RefreshExceptionDropdown()
-                return fn(...)
-            end
+
+    local open = AimbotExceptionDropdown.Open
+    if type(open) == "function" then
+        AimbotExceptionDropdown.Open = function(...)
+            RefreshExceptionDropdown()
+            return open(...)
+        end
+    end
+
+    local refresh = AimbotExceptionDropdown.Refresh
+    if type(refresh) == "function" then
+        AimbotExceptionDropdown.Refresh = function(...)
+            RefreshExceptionDropdown()
+            return refresh(...)
         end
     end
 end
